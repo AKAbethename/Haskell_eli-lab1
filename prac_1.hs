@@ -174,6 +174,37 @@ myZipWith3 anyFunc3 [] [] [] = []
 
 
 
+myAll :: (Int -> Bool) -> [Int] -> Bool
+myAll myPred (x : xs) = if (myPred x == False) then False else myAll myPred (xs)
+myAll myPred [] = True 
+
+
+myAny :: (Int -> Bool) -> [Int] -> Bool
+myAny myPred (x : xs) = if(myPred x == True) then True else myAny myPred (xs)
+myAny myPred [] = False
+
+
+
+myComposition :: (b -> c) -> (a -> b) -> a -> c
+myComposition = \f g x -> f (g x)
+
+f :: Int -> Int
+f x = x * 2
+
+g :: Int -> Int
+g x = x + 1
+
+
+
+                            
+
+
+-- myAll - проверяет удовлетворяют ли все элементы списка предикату
+-- myAny - проверяет удовлетворяют ли хотя бы один элемент списка предикату
+-- myComposition - композиция двух функций (.)
+
+
+
 
 
 
