@@ -19,12 +19,12 @@ module Pr01_1 where
 -- myUnzip - разделение списка пар на пару списков
 
 Напишите реализацию стандартных функции высшего порядка для работы со списками:
--- myFilter - применение предиката к каждому элементу списка (две реализации: с использованием охранных выражений и if-then-else)
--- myMap - применение функции одного аргумента к каждому элементу списка
--- myZipWith - применение функции двух аргументов к двум спискам
--- myZipWith3 - применение функции трех аргументов к трем спискам
--- myAll - проверяет удовлетворяют ли все элементы списка предикату
--- myAny - проверяет удовлетворяют ли хотя бы один элемент списка предикату
+-- myFilter - применение предиката к каждому элементу списка (две реализации: с использованием охранных выражений и if-then-else)  DONE
+-- myMap - применение функции одного аргумента к каждому элементу списка    DONE
+-- myZipWith - применение функции двух аргументов к двум спискам    DONE
+-- myZipWith3 - применение функции трех аргументов к трем спискам   DONE
+-- myAll - проверяет удовлетворяют ли все элементы списка предикату   DONE
+-- myAny - проверяет удовлетворяют ли хотя бы один элемент списка предикату   DONE
 -- myComposition - композиция двух функций (.)
 
 -}
@@ -51,7 +51,7 @@ myTail (x:liste) = liste
 myTail [] = error "Пустой список!"
 
 
-myTake :: [a] -> Int -> [a] -> [a]   -- копить будем эли
+myTake :: [a] -> Int -> [a] -> [a]   -- копить будем
 myTake stroka 0 ans = reverse ans
 myTake (x : tail_eli) n ans = myTake tail_eli (n-1) (x : ans)
 myTake [] n ans = if n > 0
@@ -72,7 +72,7 @@ myProduct (x : other) = x * myProduct (other)
 myProduct [] = 1
 
 
-myZip :: [a] -> [a] -> [(a, a)] -> [(a, a)]  -- Будем копить эли
+myZip :: [a] -> [a] -> [(a, a)] -> [(a, a)]  -- Будем копить
 myZip (x : otherx) (y : othery) ans = myZip (otherx) (othery) ((x, y) : ans)
 myZip [] (y : othery) ans = reverse ans
 myZip (x : otherx) [] ans = reverse ans
@@ -125,32 +125,58 @@ myFilter myPred [] = []
 -}
 
 
-
+{-
 myFilter :: (Int -> Bool) -> [Int] -> [Int]
 myFilter myPred (x : xs) | (myPred x)  =  x : myFilter myPred (xs)
                          | (myPred x == False)  =  myFilter myPred (xs)
 myFilter myPred [] = []
+-}
 
+
+
+myFilter :: (a -> Bool) -> [a] -> [a]
+myFilter p (x:xs) = if (p x) then x : (myFilter p xs) else (myFilter p xs)
+myFilter p [] = []
+
+
+myFilter2 :: (a -> Bool) -> [a] -> [a]
+myFilter2 p (x:xs)  | p x = x : (myFilter p xs)
+                    | otherwise = myFilter p xs
+ 
 
 anyFunc :: Int -> Int
 anyFunc x = x * 3
 
-
+{-
 myMap :: (Int -> Int) -> [Int] -> [Int]
 myMap anyFunc (x : xs) = (anyFunc x) : (myMap anyFunc xs)
 myMap anyFunc [] = []
+-}
 
+myMap :: (a -> b) -> [a] -> [b]
+myMap f (x:xs) = (f x) : (myMap f xs)
+myMap f [] = []
 
 -- myZipWith - применение функции двух аргументов к двум спискам
 
 anyFunc2 :: Int -> Int -> Int
 anyFunc2 x y = x * y
 
+{-
+
 myZipWith :: (Int -> Int -> Int) -> [Int] -> [Int] -> [Int]
 myZipWith anyFunc2 (x : xs) (y : ys) = (anyFunc2 x y) : (myZipWith anyFunc2 (xs) (ys))
 myZipWith anyFunc2 [] (y : ys) = (anyFunc2 1 y) : (myZipWith anyFunc2 [] (ys))
 myZipWith anyFunc2 (x : xs) [] = (anyFunc2 x 1) : (myZipWith anyFunc2 (xs) [])
 myZipWith anyFunc2 [] [] = []
+-}
+
+myZipWith :: (a -> b -> c) -> [a] -> [b] -> [c]
+
+myZipWith f (x:xs) (y:ys) = (f x y) : (myZipWith f (xs) (ys))
+myZipWith f [] (y:ys) = []
+myZipWith f (x:xs) [] = []
+myZipWith f [] [] = []
 
 
 -- myZipWith3 - применение функции трех аргументов к трем спискам
@@ -158,6 +184,9 @@ myZipWith anyFunc2 [] [] = []
 
 anyFunc3 :: Int -> Int -> Int -> Int
 anyFunc3 x y z = x + y + z
+
+
+{-
 
 myZipWith3 :: (Int -> Int -> Int -> Int) -> [Int] -> [Int] -> [Int] -> [Int]
 myZipWith3 anyFunc3 (x : xs) (y : ys) (z : zs) = (anyFunc3 x y z) : (myZipWith3 anyFunc3 (xs) (ys) (zs))
@@ -172,19 +201,43 @@ myZipWith3 anyFunc3 (x : xs) [] [] = (anyFunc3 x 0 0) : (myZipWith3 anyFunc3 (xs
 
 myZipWith3 anyFunc3 [] [] [] = []
 
+-}
+
+myZipWith3 :: (a -> b -> c -> d) -> [a] -> [b] -> [c] -> [d]
+
+myZipWith3 f (x:xs) (y:ys) (z:zs) = (f x y z) : (myZipWith3 f xs ys zs)
+myZipWith3 f [] (y:ys) (z:zs) = []
+myZipWith3 f (x:xs) [] (z:zs) = []
+myZipWith3 f (x:xs) (y:ys) [] = []
+myZipWith3 f [] [] (z:zs) = []
+myZipWith3 f (x:xs) [] [] = []
+myZipWith3 f [] (y:ys) [] = []
+myZipWith3 f [] [] [] = []
 
 
+{-
 myAll :: (Int -> Bool) -> [Int] -> Bool
 myAll myPred (x : xs) = if (myPred x == False) then False else myAll myPred (xs)
 myAll myPred [] = True 
+-}
+
+myAll :: (a -> Bool) -> [a] -> Bool
+myAll p (x:xs) = (p x) && (myAll p xs)
+myAll p [] = True
 
 
+{-
 myAny :: (Int -> Bool) -> [Int] -> Bool
 myAny myPred (x : xs) = if(myPred x == True) then True else myAny myPred (xs)
 myAny myPred [] = False
+-}
 
 
+myAny :: (a -> Bool) -> [a] -> Bool
+myAny p (x:xs) = (p x) || (myAny p xs)
+myAny p [] = False
 
+{-
 myComposition :: (b -> c) -> (a -> b) -> a -> c
 myComposition = \f g x -> f (g x)
 
@@ -194,14 +247,13 @@ f x = x * 2
 g :: Int -> Int
 g x = x + 1
 
+-}
 
 
-                            
 
 
--- myAll - проверяет удовлетворяют ли все элементы списка предикату
--- myAny - проверяет удовлетворяют ли хотя бы один элемент списка предикату
--- myComposition - композиция двух функций (.)
+myComposition :: (b -> c) -> (a -> b) -> a -> c
+myComposition f g = (\x -> f (g x))
 
 
 
