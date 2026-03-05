@@ -95,3 +95,58 @@ double :: [Int] -> [Int]
 double = map (\x -> x * 2)
 
 
+help_func :: [a] -> a -> [a]
+help_func list x = x : list
+
+myReverse :: [a] -> [a]
+myReverse xs = foldl help_func [] xs
+
+-- myFoldl1 - левая свертка для не пустых списков (без инициирующего значения)
+
+{-
+myFoldl1 :: (a -> a -> a) -> [a] -> a
+myFoldl1 f (x:xs) = answ `f` (myFoldl1 f (xs))
+            where
+                  answ = x
+myFoldl1 f [] = answ
+            where
+                  answ = Nothing
+-}
+
+myFoldl1 :: (a -> a -> a) -> [a] -> Maybe a
+myFoldl1 _ [] = Nothing
+myFoldl1 f (x:xs) = Just (foldl f x xs)
+
+
+-- myFoldr1 - правая свертка для не пустых списков (без инициирующего значения)
+
+myFoldr1 :: (a -> a -> a) -> [a] -> Maybe a
+myFoldr1 _ [] = Nothing
+myFoldr1 f (x:xs) = Just (foldr f x xs)
+
+
+
+-- myTakeWhile - реализовать с использованием сверток
+
+myTakeWhile :: (a -> Bool) -> [a] -> [a]
+
+myTakeWhile p = foldr (\x b -> if (p x) then x : b else [] ++ b) []
+
+--myTakeWhile p = foldl (\b x -> if (p x) then x : b else ([] ++ b)) []
+
+
+-- mySpan - реализовать с использованием сверток
+
+mySpan :: (a -> Bool) -> [a] -> ([a], [a])
+
+mySpan p = foldr (\x b -> if (p x) then ((x : (fst b), snd b)) else (fst b, (x : (snd b)))) ([], [])
+
+
+
+
+-- myMaybe - обработка возможно отсутствующего значения или возвращение значение по умолчанию (maybe)
+-- myMap - реализуйте функцию map с использованием типа MyList из материалов лекции
+-- myUnFoldr - развертка (операция обратная к свертке)
+
+
+
