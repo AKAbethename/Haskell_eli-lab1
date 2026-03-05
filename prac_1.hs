@@ -6,17 +6,17 @@ module Pr01_1 where
 
 {-
 
-Напишите реализацию функций myFST, mySND, myTHRD для кортежа (a,b,c)
+Напишите реализацию функций myFST, mySND, myTHRD для кортежа (a,b,c)  DONE
 
 Напишите реализацию стандартных функции для работы со списками:
--- myHead - определение (через сопоставление с образцом) функции отделения головы списка
--- myTail - функция отделения хвоста списка
--- myTake - взять первые n элементов списка
--- myDrop - отбросить первые n элементов списка
--- myProduct - перемножить все элементы списка
--- myZip - попарное объединение двух списков в список пар, длина итогового списка по длине самого короткого из входных списков
--- myZip3 объединение трех списков в список троек
--- myUnzip - разделение списка пар на пару списков
+-- myHead - определение (через сопоставление с образцом) функции отделения головы списка  DONE
+-- myTail - функция отделения хвоста списка   DONE
+-- myTake - взять первые n элементов списка   DONE
+-- myDrop - отбросить первые n элементов списка  DONE
+-- myProduct - перемножить все элементы списка  DONE
+-- myZip - попарное объединение двух списков в список пар, длина итогового списка по длине самого короткого из входных списков  DONE
+-- myZip3 объединение трех списков в список троек   DONE
+-- myUnzip - разделение списка пар на пару списков  DONE
 
 Напишите реализацию стандартных функции высшего порядка для работы со списками:
 -- myFilter - применение предиката к каждому элементу списка (две реализации: с использованием охранных выражений и if-then-else)  DONE
@@ -25,7 +25,7 @@ module Pr01_1 where
 -- myZipWith3 - применение функции трех аргументов к трем спискам   DONE
 -- myAll - проверяет удовлетворяют ли все элементы списка предикату   DONE
 -- myAny - проверяет удовлетворяют ли хотя бы один элемент списка предикату   DONE
--- myComposition - композиция двух функций (.)
+-- myComposition - композиция двух функций (.)   DONE
 
 -}
 
@@ -50,34 +50,61 @@ myTail :: [a] -> [a]
 myTail (x:liste) = liste
 myTail [] = error "Пустой список!"
 
-
+{-
 myTake :: [a] -> Int -> [a] -> [a]   -- копить будем
 myTake stroka 0 ans = reverse ans
 myTake (x : tail_eli) n ans = myTake tail_eli (n-1) (x : ans)
 myTake [] n ans = if n > 0
                 then error "Es inch a?"
                 else []
+-}
+
+myTake :: Int -> [a] -> [a]
+myTake 0 (x:xs) = []
+myTake n [] = []
+myTake n (x:xs) = x : (myTake (n-1) xs)
+
+factorial :: Int -> Int
+factorial 0 = 1  
+factorial n = n * factorial (n-1)  -- общий случай перехватывает всё
 
 
+
+{-
 myDrop :: [a] -> Int -> [a]
 myDrop stroka 0 = stroka 
 myDrop (x : tail_eli) n = myDrop (tail_eli) (n-1)
 myDrop [] n = if n > 0
                     then error "Хотим выбросить больше элементов, чем имеем!"
                     else []
+-}
+
+myDrop :: Int -> [a] -> [a]
+myDrop 0 list = list
+myDrop n (x:xs) = myDrop (n-1) (xs)
 
 
 myProduct :: [Int] -> Int
 myProduct (x : other) = x * myProduct (other)
 myProduct [] = 1
 
-
+{-
 myZip :: [a] -> [a] -> [(a, a)] -> [(a, a)]  -- Будем копить
 myZip (x : otherx) (y : othery) ans = myZip (otherx) (othery) ((x, y) : ans)
 myZip [] (y : othery) ans = reverse ans
 myZip (x : otherx) [] ans = reverse ans
 myZip [] [] ans = reverse ans
+-}
 
+
+myZip :: [a] -> [b] -> [(a, b)]
+myZip [] [] = []
+myZip xs [] = []
+myZip [] ys = []
+myZip (x:xs) (y:ys) = (x, y) : (myZip xs ys)
+
+
+{-
 
 myZip3 :: [a] -> [a] -> [a] -> [(a, a, a)] -> [(a, a, a)]
 myZip3 (x : otherx) (y : othery) (z : otherz) ans = myZip3 (otherx) (othery) (otherz) ((x, y, z) : ans)
@@ -93,13 +120,37 @@ myZip3 [] (y : othery) [] ans = reverse ans
 
 myZip3 [] [] [] ans = reverse ans
 
+-}
 
+myZip3 :: [a] -> [b] -> [c] -> [(a, b, c)]
+
+myZip3 [] [] [] = []
+myZip3 list1 [] [] = []
+myZip3 [] list2 [] = []
+myZip3 [] [] list3 = []
+myZip3 list1 list2 [] = []
+myZip3 list1 [] list3 = []
+myZip3 [] list2 list3 = []
+myZip3 (x:xs) (y:ys) (z:zs) = (x, y, z) : (myZip3 (xs) (ys) (zs))
+
+
+
+{-
 myUnzip :: [a] -> ([a], [a]) -> ([a], [a])
 myUnzip (x : y : other) ans = if length other > 1 
                                 then myUnzip (other) (x : fst ans, y : snd ans)
                                 else if length other == 1 
                                     then (reverse (myHead other : x : fst ans), reverse (y : snd ans))
                                     else (reverse (x : fst ans), reverse (y : snd ans))
+
+
+-}
+
+
+myUnzip :: [(a, b)] -> ([a], [b])
+myUnzip [] = ([], [])
+myUnzip (x:xs) = ((fst x) : (fst (myUnzip xs)), ((snd x) : (snd (myUnzip xs))))
+
 
 
 {-  Задание 2 -}
