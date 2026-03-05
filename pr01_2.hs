@@ -40,6 +40,11 @@ printDouble :: Integer -> String
 printDouble x = show (x * 2)
 
 
+-- myZipSave - попарное объединение двух списков в список пар и сохранение хвоста более длинного списка 
+-- myUnzipSave - разделение списка пар на пару списков с восстановлением более длинного списка если исходные списки были разного размера
+-- myReverse - разворот списка с использованием сверток
+
+
 
 myZipSave :: [a] -> [a] -> ([(a, a)], [a])
 myZipSave (x : xs) (y : ys) = localfunc (x : xs) (y : ys) ans
@@ -128,18 +133,23 @@ myFoldr1 f (x:xs) = Just (foldr f x xs)
 
 -- myTakeWhile - реализовать с использованием сверток
 
+--myTakeWhile p = foldr (\x b -> if (p x) then x : b else [] ++ b) []
+
+localTakeWhile :: (a -> Bool) -> [a] -> ([a], [a])
+localTakeWhile p = foldl (\b x -> if ((p x) && all p (snd b)) then (((fst b) ++ [x]), snd b) else ((fst b, ((snd b) ++ [x])))) ([], [])
+
+      
 myTakeWhile :: (a -> Bool) -> [a] -> [a]
-
-myTakeWhile p = foldr (\x b -> if (p x) then x : b else [] ++ b) []
-
---myTakeWhile p = foldl (\b x -> if (p x) then x : b else ([] ++ b)) []
+myTakeWhile p list = fst (localTakeWhile p list)
 
 
 -- mySpan - реализовать с использованием сверток
 
 mySpan :: (a -> Bool) -> [a] -> ([a], [a])
 
-mySpan p = foldr (\x b -> if (p x) then ((x : (fst b), snd b)) else (fst b, (x : (snd b)))) ([], [])
+mySpan p = foldl (\b x -> if ((p x) && all p (snd b)) then (((fst b) ++ [x], snd b)) else (fst b, ((snd b) ++ [x]))) ([], [])
+
+                
 
 
 
