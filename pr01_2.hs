@@ -9,14 +9,14 @@ module Pr01_2 where
 Напишите реализацию функций:
 -- myZipSave - попарное объединение двух списков в список пар и сохранение хвоста более длинного списка 
 -- myUnzipSave - разделение списка пар на пару списков с восстановлением более длинного списка если исходные списки были разного размера
--- myReverse - разворот списка с использованием сверток
--- myFoldl1 - левая свертка для не пустых списков (без инициирующего значения)
--- myFoldr1 - правая свертка для не пустых списков (без инициирующего значения)
--- myTakeWhile - реализовать с использованием сверток
--- mySpan - реализовать с использованием сверток
--- myMaybe - обработка возможно отсутствующего значения или возвращение значение по умолчанию (maybe)
--- myMap - реализуйте функцию map с использованием типа MyList из материалов лекции
--- myUnFoldr - развертка (операция обратная к свертке)
+-- myReverse - разворот списка с использованием сверток  DONE
+-- myFoldl1 - левая свертка для не пустых списков (без инициирующего значения)  DONE
+-- myFoldr1 - правая свертка для не пустых списков (без инициирующего значения)  DONE
+-- myTakeWhile - реализовать с использованием сверток  DONE
+-- mySpan - реализовать с использованием сверток  DONE
+-- myMaybe - обработка возможно отсутствующего значения или возвращение значение по умолчанию (maybe)  DONE
+-- myMap - реализуйте функцию map с использованием типа MyList из материалов лекции  DONE
+-- myUnFoldr - развертка (операция обратная к свертке)  DONE
 
 -- Расширьте типы для выпекания тортов из материалов лекции:
     -- Добавить возможность испечь не менее трех типов тортов
@@ -27,24 +27,12 @@ module Pr01_2 where
 
 
 
-myProduct :: (b -> a -> b) -> b -> [a] -> b
-
-myProduct f y (x:xs) = myProduct f (y `f` x) (xs)
-myProduct f y [] = y
-
-
-halve :: Integer -> Integer
-halve a = a `div` 2 
-
-printDouble :: Integer -> String
-printDouble x = show (x * 2)
-
-
 -- myZipSave - попарное объединение двух списков в список пар и сохранение хвоста более длинного списка 
 -- myUnzipSave - разделение списка пар на пару списков с восстановлением более длинного списка если исходные списки были разного размера
 -- myReverse - разворот списка с использованием сверток
 
 
+{-
 
 myZipSave :: [a] -> [a] -> ([(a, a)], [a])
 myZipSave (x : xs) (y : ys) = localfunc (x : xs) (y : ys) ans
@@ -59,6 +47,28 @@ myZipSave (x : xs) (y : ys) = localfunc (x : xs) (y : ys) ans
 myZipSave [] (y : ys) = ([], y : ys)
 myZipSave (x : xs) [] = ([], x : xs)
 myZipSave [] [] = ([], [])
+
+-}
+
+-- myZipSave - попарное объединение двух списков в список пар и сохранение хвоста более длинного списка
+
+helpZipSave :: [a] -> [b] -> ([(a, b)], ([a], [b])) -> ([(a, b)], ([a], [b]))
+
+helpZipSave (x : xs) (y : ys) ans = helpZipSave xs ys ((x, y) : fst ans, snd ans)
+helpZipSave [] (y:ys) ans = helpZipSave [] ys (fst ans, (fst (snd ans), y : (snd (snd ans))))
+helpZipSave (x:xs) [] ans = helpZipSave xs [] (fst ans, (x : (fst (snd ans)), snd (snd ans)))
+helpZipSave [] [] ans = (reverse $ fst ans, (reverse $ fst $ snd ans, reverse $ snd $ snd ans))
+
+{-
+myZipSave :: [a] -> [b] -> ([(a, b)], [a])
+myZipSave (x:xs) (y:ys) = (fst $ func, if (null $ fst $ snd $ func) then (snd $ snd $ func) else (fst $ snd $ func))
+
+                  where func = helpZipSave (x : xs) (y : ys) ([], ([], []))
+
+-}
+
+
+--myZipSave :: [a] -> [b] -> ([([a], [b])], [a])
 
                     
 
@@ -88,17 +98,8 @@ myUnzipSave (z : zs, []) = locf (z : zs, []) ans
 myUnzipSave ([], []) = ([], []) 
 
 
---myReverse :: ((b -> a -> b) -> b -> a -> b)
 
---myReverse 
-
-
-double :: [Int] -> [Int]
-
---double list = map (\x -> x * 2) list
-
-double = map (\x -> x * 2)
-
+-- myReverse - разворот списка с использованием сверток
 
 help_func :: [a] -> a -> [a]
 help_func list x = x : list
@@ -108,15 +109,6 @@ myReverse xs = foldl help_func [] xs
 
 -- myFoldl1 - левая свертка для не пустых списков (без инициирующего значения)
 
-{-
-myFoldl1 :: (a -> a -> a) -> [a] -> a
-myFoldl1 f (x:xs) = answ `f` (myFoldl1 f (xs))
-            where
-                  answ = x
-myFoldl1 f [] = answ
-            where
-                  answ = Nothing
--}
 
 myFoldl1 :: (a -> a -> a) -> [a] -> Maybe a
 myFoldl1 _ [] = Nothing
@@ -149,14 +141,57 @@ mySpan :: (a -> Bool) -> [a] -> ([a], [a])
 
 mySpan p = foldl (\b x -> if ((p x) && all p (snd b)) then (((fst b) ++ [x], snd b)) else (fst b, ((snd b) ++ [x]))) ([], [])
 
-                
-
-
-
 
 -- myMaybe - обработка возможно отсутствующего значения или возвращение значение по умолчанию (maybe)
+                
+myMaybe :: b -> (a -> b) -> Maybe a -> b
+--myMaybe def _ Nothing = def
+--myMaybe _ f (Just x) = f x
+
+myMaybe def f mx = case mx of 
+      Nothing -> def
+      Just a -> f a
+
+data MyList a = MyEmpty | MyCons a (MyList a)
+--     MyList a — алгебраический тип с конструктором MyEmpty (пустой список) и MyCons (элемент и хвост списка)
+mylist = MyCons 3 (MyCons 5 MyEmpty)
+
+mylist2 = MyCons 3 (MyCons 4 (MyCons 5 (MyCons 6 MyEmpty)))
+
+
 -- myMap - реализуйте функцию map с использованием типа MyList из материалов лекции
+
+myMap :: (a -> b) -> MyList a -> [b]
+myMap f MyEmpty = []
+myMap f (MyCons x xs) = (f x) : (myMap f xs)
+
+
+
+myLength :: MyList a -> Int
+myLength MyEmpty = 0                          -- базовый случай
+myLength (MyCons _ xs) = 1 + myLength xs      -- рекурсивный случай
+
+
+myPrint :: MyList a -> [a]
+myPrint MyEmpty = []                          -- базовый случай
+myPrint (MyCons x xs) = x : myPrint xs      -- рекурсивный случай
+
+
 -- myUnFoldr - развертка (операция обратная к свертке)
+
+myUnFoldr :: (b -> Maybe (a, b)) -> b -> [a]
+
+myUnFoldr f b = case f b of
+      Nothing -> []
+      Just (x, newb) -> x : (myUnFoldr f newb)
+
+
+
+
+-- Расширьте типы для выпекания тортов из материалов лекции:
+    -- Добавить возможность испечь не менее трех типов тортов
+    -- Контроль числа и объема используемых ингредиентов
+    -- Обработку недостатка или отсутствия ингредиентов
 
 
 
