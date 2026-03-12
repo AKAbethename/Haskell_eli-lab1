@@ -28,27 +28,8 @@ module Pr01_2 where
 
 
 -- myZipSave - попарное объединение двух списков в список пар и сохранение хвоста более длинного списка 
--- myUnzipSave - разделение списка пар на пару списков с восстановлением более длинного списка если исходные списки были разного размера
--- myReverse - разворот списка с использованием сверток
 
 
-{-
-
-myZipSave :: [a] -> [a] -> ([(a, a)], [a])
-myZipSave (x : xs) (y : ys) = localfunc (x : xs) (y : ys) ans
-
-                where localfunc (x : xs) (y : ys) ans = localfunc xs ys ((x, y) : ans) 
-                      localfunc [] (y : ys) ans = (reverse ans, (y:ys))
-                      localfunc (x : xs) [] ans = (reverse ans, (x:xs))
-                      localfunc [] [] ans = (reverse ans, [])
-                      
-                      ans = []
-
-myZipSave [] (y : ys) = ([], y : ys)
-myZipSave (x : xs) [] = ([], x : xs)
-myZipSave [] [] = ([], [])
-
--}
 
 -- myZipSave - попарное объединение двух списков в список пар и сохранение хвоста более длинного списка
 
@@ -59,25 +40,8 @@ helpZipSave [] (y:ys) ans = helpZipSave [] ys (fst ans, (fst (snd ans), y : (snd
 helpZipSave (x:xs) [] ans = helpZipSave xs [] (fst ans, (x : (fst (snd ans)), snd (snd ans)))
 helpZipSave [] [] ans = (reverse $ fst ans, (reverse $ fst $ snd ans, reverse $ snd $ snd ans))
 
-{-
-myZipSave :: [a] -> [b] -> ([(a, b)], [a])
-myZipSave (x:xs) (y:ys) = (fst $ func, if (null $ fst $ snd $ func) then (snd $ snd $ func) else (fst $ snd $ func))
-
-                  where func = helpZipSave (x : xs) (y : ys) ([], ([], []))
-
--}
 
 
-
-
-{-
-myZipSave_help [] [] = ans
-myZipSave_help [] (y:ys) = Right y : (snd ans)
-myZipSave_help (x:xs) [] = Left x : (snd ans)
-myZipSave_help (x:xs) (y:ys) = (x, y) : (fst ans)
-      where
-            ans = ([], [])
--}
 
 myZIP :: [a] -> [b] -> [(a, b)] 
 
@@ -88,46 +52,25 @@ myZIP (x:xs) (y:ys) = (x, y) : (myZIP xs ys)
 
 
 
-
 {-
-myZip :: [a] -> [b] -> ([(a, b)] , Either [a] [b])
-
-myZip (x:xs) (y:ys) = localZip (x:xs) (y:ys) (fir, sec)
-                  where
-                        fir = []
-                        sec = Left []
-                        localZip [] [] (fir, sec) = (reverse fir, sec)   -- ([], [])
-                        localZip list [] (fir, sec) = (reverse fir, (Left list))
-                        localZip [] list (fir, sec) = (reverse fir, (Right list))
-                        localZip (x:xs) (y:ys) (fir, sec) = localZip xs ys (((x, y) : fir), sec)
-
--}
-
-{-
-
-myZip :: [a] -> [b] -> ([(a, b)], Either [a] [b])
-myZip [] [] = ([], Left [])
-myZip [] list = ([], Right list)
-myZip list [] = ([], Left list)
-myZip (x:xs) (y:ys) = localZip (x:xs) (y:ys) (fir, sec)
-                  where
-                        fir = []
-                        sec = Right []
-                        localZip [] [] (fir, sec) = (fir, sec)   -- ([], [])
-                        localZip list [] (fir, sec) = (fir, Left list)
-                        localZip [] list (fir, sec) = (fir, Right list)
-                        localZip (x:xs) (y:ys) (fir, sec) = localZip xs ys (((x, y) : fir), sec)
-                  
--}
-
 myZip :: [a] -> [b] -> ([(a, b)], Either [a] [b])
 myZip [] [] = ([], Right [])
 myZip [] list = ([], Right list)
 myZip list [] = ([], Left list)
 myZip (x:xs) (y:ys) = ( (x, y) : (fst (myZip xs ys)), snd (myZip xs ys) )
 
+-}
 
- 
+
+myZip :: [a] -> [b] -> ([(a, b)], Either [a] [b])
+myZip [] [] = ([], Right [])
+myZip [] list = ([], Right list)
+myZip list [] = ([], Left list)
+myZip (x:xs) (y:ys) = let (pairs, rest) = myZip xs ys in ((x, y) : pairs, rest)
+
+-- myUnzipSave - разделение списка пар на пару списков с восстановлением более длинного списка если исходные списки были разного размера
+
+{-
 myUnZip :: ([(a, b)], Either [a] [b]) -> ([a], [b])
 myUnZip ([], Left []) = ([], [])
 myUnZip ([], Right []) = ([], [])
@@ -137,9 +80,17 @@ myUnZip ([], Left list) = (fst (myUnZip ([], Left [])) ++ list, snd (myUnZip ([]
 myUnZip ([], Right list) = (fst (myUnZip ([], Right [])), snd (myUnZip ([], Right [])) ++ list)
 myUnZip (p:ps, Left list) = ( (fst p) : fst (myUnZip (ps, Left list)) , (snd p) : snd (myUnZip (ps, Left list)) )
 myUnZip (p:ps, Right list) = ( (fst p) : fst (myUnZip (ps, Right list)) , (snd p) : snd (myUnZip (ps, Right list)) )
+-}
 
-
-
+myUnZip :: ([(a, b)], Either [a] [b]) -> ([a], [b])
+myUnZip ([], Left []) = ([], [])
+myUnZip ([], Right []) = ([], [])
+myUnZip (p:ps, Left []) = let (list1, list2) = myUnZip (ps, Left []) in ((fst p) : list1, (snd p) : list2)
+myUnZip (p:ps, Right []) = let (list1, list2) = myUnZip (ps, Right []) in ((fst p) : list1, (snd p) : list2)
+myUnZip ([], Left list) = let (list1, list2) = myUnZip ([], Left []) in (list1 ++ list, list2)
+myUnZip ([], Right list) = let (list1, list2) = myUnZip ([], Right []) in (list1, list2 ++ list)
+myUnZip (p:ps, Left list) = let (list1, list2) = myUnZip (ps, Left list) in ((fst p) : list1, (snd p) : list2)
+myUnZip (p:ps, Right list) = let (list1, list2) = myUnZip (ps, Right list) in ((fst p) : list1, (snd p) : list2)
 
 myZipSave :: [a] -> [b] -> Either ([(a, b)], [a]) ([(a, b)], [b])
 myZipSave xs ys = local xs ys ([], [])
