@@ -354,22 +354,12 @@ data Ingredients = Oil | Chocolate | Egg | Flour | Shugar | BakingPowder
                        | BlackcurrantJam 
                        | Honey | Butter | Vanilin deriving Show
 
-data FillingMix = OilChocolateMix | EggShugarVanilinBlackcurrantJamMix | HoneyShugarButterMix
+data FillingMix = OilChocolateMix | EggShugarVanilinBlackcurrantJamMix | HoneyShugarButterMix deriving Show
 
-data CakeDough = ChocolateCakeDough | HoneyCakeDough | NegroSmileCakeDough
+data CakeDough = ChocolateCakeDough | HoneyCakeDough | NegroSmileCakeDough deriving Show
 
-data Action = Bake
+data Action = Bake | Knead deriving Show
 
-
-makeCakeMix :: Ingredients -> Ingredients -> Maybe FillingMix
-makeCakeMix x Oil = case x of
-                  Chocolate -> Just OilChocolateMix
-                  _ -> Nothing
-
-makeCakeMixH :: Ingredients -> Ingredients -> Ingredients -> Maybe FillingMix
-makeCakeMixH x Shugar Butter = case x of
-                              Honey -> Just HoneyShugarButterMix
-                              _ -> Nothing
 
 controlEggs :: Ingredients -> Int  -- 2
 controlEggs Egg = 2
@@ -377,14 +367,51 @@ controlEggs Egg = 2
 controllHoney :: Ingredients -> Int  -- 50g
 controllHoney Honey = 50
 
-makeCakeMixN :: Ingredients -> (Ingredients, Int) -> Ingredients -> Ingredients -> Maybe FillingMix
-makeCakeMixN BlackcurrantJam (Egg, x) Shugar Vanilin = case x of
-                                                      2 -> Just EggShugarVanilinBlackcurrantJamMix
-                                                      _ -> Nothing
+massHoney = controllHoney Honey
+
+cntEggs = controlEggs Egg
+
+makeCakeMix :: Ingredients -> Ingredients -> Maybe FillingMix
+makeCakeMix x Oil = case x of
+                  Chocolate -> Just OilChocolateMix
+                  _ -> Nothing
 
 
+makeCakeMixH :: (Ingredients, Int) -> Ingredients -> Ingredients -> Maybe FillingMix
+makeCakeMixH (Honey, x) Shugar Butter 
+                        | x == (controllHoney Honey) = Just HoneyShugarButterMix
+                        | otherwise = Nothing
+makeCakeMixH _ _ _ = Nothing
 
 
+makeCakeMixN :: (Ingredients, Int) -> Ingredients -> Ingredients -> Ingredients ->  Maybe FillingMix
+makeCakeMixN (Egg, x) Shugar Vanilin BlackcurrantJam 
+                                          | x == (controlEggs Egg) = Just EggShugarVanilinBlackcurrantJamMix
+                                          | otherwise = Nothing
+makeCakeMixN _ _ _ _ = Nothing
+
+
+honeyCakeDough :: Ingredients -> Maybe FillingMix -> Maybe CakeDough
+honeyCakeDough Flour x = case x of
+                  Just HoneyShugarButterMix -> Just HoneyCakeDough
+                  Nothing -> Nothing
+
+
+negroSmileCakeDough :: Ingredients -> Maybe FillingMix -> Maybe CakeDough
+negroSmileCakeDough Flour x = case x of
+                  Just EggShugarVanilinBlackcurrantJamMix -> Just NegroSmileCakeDough
+                  Nothing -> Nothing
+
+honeyCake :: Maybe CakeDough -> Action -> Action -> Maybe Cake
+honeyCake x Knead Bake = case x of
+                        Just HoneyCakeDough -> Just HoneyCake
+                        Nothing -> Nothing
+
+
+negroSmileCake :: Maybe CakeDough -> Action -> Action -> Maybe Cake
+negroSmileCake x Knead Bake = case x of
+                        Just NegroSmileCakeDough -> Just NegroSmileCake
+                        Nothing -> Nothing
 
 {-
 data FillingMix = OilChocolateMix deriving Show
