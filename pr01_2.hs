@@ -278,6 +278,8 @@ myUnFoldr f b = case f b of
 
 
 {-
+
+{-
 Реализуем пример приготовления торта из материалов прошлой лекции:
 
 > (Масло-шоколадная смесь) состоит из растопленных на слабом огне масла и шоколада
@@ -336,6 +338,7 @@ myCake = chocolateCake myCakeDough Bake
 Типы можно расширить и параметризовать для отслеживания объема и количества ингредиентов
 -}
 
+-}
 
 
 -- Расширьте типы для выпекания тортов из материалов лекции:
@@ -344,4 +347,93 @@ myCake = chocolateCake myCakeDough Bake
     -- Обработку недостатка или отсутствия ингредиентов
 
 
+
+data Cake = ChocolateCake | HoneyCake | NegroSmileCake deriving Show
+data Ingredients = Oil | Chocolate | Egg | Flour | Shugar | BakingPowder 
+                       | Sault | Soda | StrawberryJam | Kefir
+                       | BlackcurrantJam 
+                       | Honey | Butter | Vanilin deriving Show
+
+data FillingMix = OilChocolateMix | EggShugarVanilinBlackcurrantJamMix | HoneyShugarButterMix
+
+data CakeDough = ChocolateCakeDough | HoneyCakeDough | NegroSmileCakeDough
+
+data Action = Bake
+
+
+makeCakeMix :: Ingredients -> Ingredients -> Maybe FillingMix
+makeCakeMix x Oil = case x of
+                  Chocolate -> Just OilChocolateMix
+                  _ -> Nothing
+
+makeCakeMixH :: Ingredients -> Ingredients -> Ingredients -> Maybe FillingMix
+makeCakeMixH x Shugar Butter = case x of
+                              Honey -> Just HoneyShugarButterMix
+                              _ -> Nothing
+
+controlEggs :: Ingredients -> Int  -- 2
+controlEggs Egg = 2
+
+controllHoney :: Ingredients -> Int  -- 50g
+controllHoney Honey = 50
+
+makeCakeMixN :: Ingredients -> (Ingredients, Int) -> Ingredients -> Ingredients -> Maybe FillingMix
+makeCakeMixN BlackcurrantJam (Egg, x) Shugar Vanilin = case x of
+                                                      2 -> Just EggShugarVanilinBlackcurrantJamMix
+                                                      _ -> Nothing
+
+
+
+
+
+{-
+data FillingMix = OilChocolateMix deriving Show
+data Dough = CakeDough deriving Show
+data CakeDough = ChocolateCakeDough deriving Show
+data Cake = ChocolateCake deriving Show
+data Action = Bake deriving Show
+-}
+
+
+-- Функции, которые описывают процесс приготовления частей торта
+
+{-
+makeCakeMix :: Ingredients -> Ingredients -> FillingMix
+makeCakeMix Oil Chocolate = OilChocolateMix
+makeCakeMix Chocolate Oil = OilChocolateMix
+-}
+
+{-
+
+makeCakeMix :: Ingredients -> Ingredients -> Maybe FillingMix
+makeCakeMix Oil x = case x of
+                        Chocolate -> Just OilChocolateMix
+                        _ -> Nothing
+
+-- ...
+
+cakeDough :: Ingredients -> Ingredients -> Ingredients -> Ingredients -> Dough
+cakeDough Egg Flour Shugar BakingPowder = CakeDough
+-- ...
+
+chocolateCakeDough :: Dough -> FillingMix -> CakeDough
+chocolateCakeDough CakeDough OilChocolateMix = ChocolateCakeDough
+-- ...
+
+chocolateCake :: CakeDough -> Action -> Cake
+chocolateCake ChocolateCakeDough Bake = ChocolateCake
+-- ...
+
+-- Промежуточные стадии приготовления торта:
+myDough = cakeDough Egg Flour Shugar BakingPowder
+notMyDough = cakeDough Egg Egg Egg Egg -- ! не работает
+myMix = makeCakeMix Oil Chocolate
+--myCakeDough = chocolateCakeDough myDough myMix
+myCakeDough = case makeCakeMix Oil Chocolate of
+    Just mix -> chocolateCakeDough myDough mix
+    Nothing -> error "Не удалось сделать смесь!"
+-- Финальный торт:
+myCake = chocolateCake myCakeDough Bake
+
+-}
 
