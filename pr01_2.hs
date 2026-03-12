@@ -103,6 +103,8 @@ myZip (x:xs) (y:ys) = localZip (x:xs) (y:ys) (fir, sec)
 
 -}
 
+{-
+
 myZip :: [a] -> [b] -> ([(a, b)], Either [a] [b])
 myZip [] [] = ([], Left [])
 myZip [] list = ([], Right list)
@@ -116,49 +118,25 @@ myZip (x:xs) (y:ys) = localZip (x:xs) (y:ys) (fir, sec)
                         localZip [] list (fir, sec) = (fir, Right list)
                         localZip (x:xs) (y:ys) (fir, sec) = localZip xs ys (((x, y) : fir), sec)
                   
+-}
+
+myZip :: [a] -> [b] -> ([(a, b)], Either [a] [b])
+myZip [] [] = ([], Right [])
+myZip [] list = ([], Right list)
+myZip list [] = ([], Left list)
+myZip (x:xs) (y:ys) = ( (x, y) : (fst (myZip xs ys)), snd (myZip xs ys) )
 
 
+ 
 myUnZip :: ([(a, b)], Either [a] [b]) -> ([a], [b])
 myUnZip ([], Left []) = ([], [])
 myUnZip ([], Right []) = ([], [])
-
 myUnZip (p:ps, Left []) = ( (fst p) : fst (myUnZip (ps, Left [])) , (snd p) : snd (myUnZip (ps, Left [])) )
 myUnZip (p:ps, Right []) = ( (fst p) : fst (myUnZip (ps, Right [])) , (snd p) : snd (myUnZip (ps, Right [])) )
-
 myUnZip ([], Left list) = (fst (myUnZip ([], Left [])) ++ list, snd (myUnZip ([], Left [])))
 myUnZip ([], Right list) = (fst (myUnZip ([], Right [])), snd (myUnZip ([], Right [])) ++ list)
-
 myUnZip (p:ps, Left list) = ( (fst p) : fst (myUnZip (ps, Left list)) , (snd p) : snd (myUnZip (ps, Left list)) )
 myUnZip (p:ps, Right list) = ( (fst p) : fst (myUnZip (ps, Right list)) , (snd p) : snd (myUnZip (ps, Right list)) )
-
-
-{-
-myUnZip :: ([(a,b)], Either [a] [b]) -> ([a], [b])
-myUnZip (pairs, rest) =
-    let (as, bs) = unzip pairs
-    in case rest of
-        Left xs  -> (as ++ xs, bs)
-        Right ys -> (as, bs ++ ys)
-
--}                      
-
-
-
-{-
-
-myZip :: [a] -> [b] -> ([(a, b)], Either [a] [b])
-myZip (x:xs) (y:ys) = localZip (x:xs) (y:ys) (fir, sec)
-                  where
-                        fir = []
-                        sec = Left []
-                        localZip [] [] (fir, sec) = (reverse fir, sec)
-                        localZip list [] (fir, sec) = (reverse fir, Left list)
-                        localZip [] list (fir, sec) = (reverse fir, Right list)
-                        localZip (x:xs) (y:ys) (fir, sec) = localZip xs ys (((x, y) : fir), sec)
-
-
--}
-
 
 
 
