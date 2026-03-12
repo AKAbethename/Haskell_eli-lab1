@@ -68,16 +68,129 @@ myZipSave (x:xs) (y:ys) = (fst $ func, if (null $ fst $ snd $ func) then (snd $ 
 -}
 
 
+
+
+{-
+myZipSave_help [] [] = ans
+myZipSave_help [] (y:ys) = Right y : (snd ans)
+myZipSave_help (x:xs) [] = Left x : (snd ans)
+myZipSave_help (x:xs) (y:ys) = (x, y) : (fst ans)
+      where
+            ans = ([], [])
+-}
+
+myZIP :: [a] -> [b] -> [(a, b)] 
+
+myZIP [] [] = []
+myZIP (x:xs) [] = []
+myZIP [] (y:ys) = [] 
+myZIP (x:xs) (y:ys) = (x, y) : (myZIP xs ys)
+
+
+
+
+{-
+myZip :: [a] -> [b] -> ([(a, b)] , Either [a] [b])
+
+myZip (x:xs) (y:ys) = localZip (x:xs) (y:ys) (fir, sec)
+                  where
+                        fir = []
+                        sec = Left []
+                        localZip [] [] (fir, sec) = (reverse fir, sec)   -- ([], [])
+                        localZip list [] (fir, sec) = (reverse fir, (Left list))
+                        localZip [] list (fir, sec) = (reverse fir, (Right list))
+                        localZip (x:xs) (y:ys) (fir, sec) = localZip xs ys (((x, y) : fir), sec)
+
+-}
+
+myZip :: [a] -> [b] -> ([(a, b)], Either [a] [b])
+myZip [] [] = ([], Left [])
+myZip [] list = ([], Right list)
+myZip list [] = ([], Left list)
+myZip (x:xs) (y:ys) = localZip (x:xs) (y:ys) (fir, sec)
+                  where
+                        fir = []
+                        sec = Right []
+                        localZip [] [] (fir, sec) = (fir, sec)   -- ([], [])
+                        localZip list [] (fir, sec) = (fir, Left list)
+                        localZip [] list (fir, sec) = (fir, Right list)
+                        localZip (x:xs) (y:ys) (fir, sec) = localZip xs ys (((x, y) : fir), sec)
+                  
+
+
+myUnZip :: ([(a, b)], Either [a] [b]) -> ([a], [b])
+myUnZip ([], Left []) = ([], [])
+myUnZip ([], Right []) = ([], [])
+
+myUnZip (p:ps, Left []) = ( (fst p) : fst (myUnZip (ps, Left [])) , (snd p) : snd (myUnZip (ps, Left [])) )
+myUnZip (p:ps, Right []) = ( (fst p) : fst (myUnZip (ps, Right [])) , (snd p) : snd (myUnZip (ps, Right [])) )
+
+myUnZip ([], Left list) = (fst (myUnZip ([], Left [])) ++ list, snd (myUnZip ([], Left [])))
+myUnZip ([], Right list) = (fst (myUnZip ([], Right [])), snd (myUnZip ([], Right [])) ++ list)
+
+myUnZip (p:ps, Left list) = ( (fst p) : fst (myUnZip (ps, Left list)) , (snd p) : snd (myUnZip (ps, Left list)) )
+myUnZip (p:ps, Right list) = ( (fst p) : fst (myUnZip (ps, Right list)) , (snd p) : snd (myUnZip (ps, Right list)) )
+
+
+{-
+myUnZip :: ([(a,b)], Either [a] [b]) -> ([a], [b])
+myUnZip (pairs, rest) =
+    let (as, bs) = unzip pairs
+    in case rest of
+        Left xs  -> (as ++ xs, bs)
+        Right ys -> (as, bs ++ ys)
+
+-}                      
+
+
+
+{-
+
+myZip :: [a] -> [b] -> ([(a, b)], Either [a] [b])
+myZip (x:xs) (y:ys) = localZip (x:xs) (y:ys) (fir, sec)
+                  where
+                        fir = []
+                        sec = Left []
+                        localZip [] [] (fir, sec) = (reverse fir, sec)
+                        localZip list [] (fir, sec) = (reverse fir, Left list)
+                        localZip [] list (fir, sec) = (reverse fir, Right list)
+                        localZip (x:xs) (y:ys) (fir, sec) = localZip xs ys (((x, y) : fir), sec)
+
+
+-}
+
+
+
+
+
+myZipSave :: [a] -> [b] -> Either ([(a, b)], [a]) ([(a, b)], [b])
+myZipSave xs ys = local xs ys ([], [])
+  where
+    local [] [] (pairs, rest) = Left (reverse pairs, rest)
+    local (x:xs) [] (pairs, rest) = Left (reverse pairs, x:xs)
+    local [] (y:ys) (pairs, rest) = Right (reverse pairs, y:ys)
+    local (x:xs) (y:ys) (pairs, rest) = local xs ys ((x,y):pairs, rest)
+
 --myZipSave :: [a] -> [b] -> ([([a], [b])], [a])
+
+
+-- myUnzipSave - разделение списка пар на пару списков с восстановлением более длинного списка если исходные списки были разного размера
+
+-- НЕ РАБОТАЕТ
+myUnzipSave2 :: Either ([(a, b)], [a]) ([(a, b)], [b]) -> ([a], [b])
+myUnzipSave2 (Left (pairs, extras)) = localLeft (pairs, extras) ([], [])
+      where localLeft ([], e) (fans, sans) = (reverse fans ++ e, reverse sans)
+            localLeft ((x:xs), e) (fans, sans) = localLeft (xs, e) ((fst x):fans, (snd x):sans)
+            
+myUnzipSave2 (Right (pairs, extras)) = localRight (pairs, extras) ([], [])
+      where localRight ([], e) (fans, sans) = (reverse fans, reverse sans ++ e)
+            localRight ((x:xs), e) (fans, sans) = localRight (xs, e) ((fst x):fans, (snd x):sans)
 
                     
 
 
-myUnzipSave :: ([(a, a)], [a]) -> ([a], [a])
-
-
-
-myUnzipSave ((z : zs), (r : rs)) = localfunc2 ((z : zs), (r : rs)) ans 
+myUnzipSave :: ([(a, a)    ], [a ]     ) -> ([a], [a])
+myUnzipSave    ((   z  : zs), (r : rs))  = localfunc2 ((z : zs), (r : rs)) ans 
                 where localfunc2 ((z : zs), (r : rs)) ans = localfunc2(zs, (r : rs)) (((fst z) : (fst ans)), ((snd z) : (snd ans)))
 
                       localfunc2 ([], (r : rs)) ans = localfunc2 ([], []) (fst ans, (reverse (r : rs)) ++ snd ans)
@@ -168,13 +281,13 @@ myMap f (MyCons x xs) = (f x) : (myMap f xs)
 
 
 myLength :: MyList a -> Int
-myLength MyEmpty = 0                          -- базовый случай
-myLength (MyCons _ xs) = 1 + myLength xs      -- рекурсивный случай
+myLength MyEmpty = 0                          
+myLength (MyCons _ xs) = 1 + myLength xs      
 
 
 myPrint :: MyList a -> [a]
-myPrint MyEmpty = []                          -- базовый случай
-myPrint (MyCons x xs) = x : myPrint xs      -- рекурсивный случай
+myPrint MyEmpty = []                         
+myPrint (MyCons x xs) = x : myPrint xs      
 
 
 -- myUnFoldr - развертка (операция обратная к свертке)
@@ -185,6 +298,65 @@ myUnFoldr f b = case f b of
       Nothing -> []
       Just (x, newb) -> x : (myUnFoldr f newb)
 
+
+{-
+Реализуем пример приготовления торта из материалов прошлой лекции:
+
+> (Масло-шоколадная смесь) состоит из растопленных на слабом огне масла и шоколада
+> [Тесто для торта] состоит из 8 взбитых яиц, муки, сахара и разрыхлителя
+> {Тесто для шоколадного торта} – это [тесто для торта], перемешанное с (масло-шоколадной смесью)
+> Шоколадный торт – это {тесто для шоколадного торта}, выпеченное в духовке при 200C в течение 25 минут.
+-}
+
+-- Типы описания составляющих:
+data Ingredients = Oil | Chocolate | Egg | Flour | Shugar | BakingPowder deriving Show
+data FillingMix = OilChocolateMix deriving Show
+data Dough = CakeDough deriving Show
+data CakeDough = ChocolateCakeDough deriving Show
+data Cake = ChocolateCake deriving Show
+data Action = Bake deriving Show
+
+-- Функции, которые описывают процесс приготовления частей торта
+
+{-
+makeCakeMix :: Ingredients -> Ingredients -> FillingMix
+makeCakeMix Oil Chocolate = OilChocolateMix
+makeCakeMix Chocolate Oil = OilChocolateMix
+-}
+
+makeCakeMix :: Ingredients -> Ingredients -> Maybe FillingMix
+makeCakeMix Oil x = case x of
+                        Chocolate -> Just OilChocolateMix
+                        _ -> Nothing
+
+-- ...
+
+cakeDough :: Ingredients -> Ingredients -> Ingredients -> Ingredients -> Dough
+cakeDough Egg Flour Shugar BakingPowder = CakeDough
+-- ...
+
+chocolateCakeDough :: Dough -> FillingMix -> CakeDough
+chocolateCakeDough CakeDough OilChocolateMix = ChocolateCakeDough
+-- ...
+
+chocolateCake :: CakeDough -> Action -> Cake
+chocolateCake ChocolateCakeDough Bake = ChocolateCake
+-- ...
+
+-- Промежуточные стадии приготовления торта:
+myDough = cakeDough Egg Flour Shugar BakingPowder
+notMyDough = cakeDough Egg Egg Egg Egg -- ! не работает
+myMix = makeCakeMix Oil Chocolate
+--myCakeDough = chocolateCakeDough myDough myMix
+myCakeDough = case makeCakeMix Oil Chocolate of
+    Just mix -> chocolateCakeDough myDough mix
+    Nothing -> error "Не удалось сделать смесь!"
+-- Финальный торт:
+myCake = chocolateCake myCakeDough Bake
+
+{-
+Типы можно расширить и параметризовать для отслеживания объема и количества ингредиентов
+-}
 
 
 
