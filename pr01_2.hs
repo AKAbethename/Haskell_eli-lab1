@@ -149,20 +149,72 @@ help_func list x = x : list
 myReverse :: [a] -> [a]
 myReverse xs = foldl help_func [] xs
 
+
 -- myFoldl1 - левая свертка для не пустых списков (без инициирующего значения)
 
-
+{-
 myFoldl1 :: (a -> a -> a) -> [a] -> Maybe a
 myFoldl1 _ [] = Nothing
 myFoldl1 f (x:xs) = Just (foldl f x xs)
+-}
+
+{-
+myFoldl1 :: (a -> a -> a) -> [a] -> a
+myFoldl1 f (x : xs) = if length (x:xs) > 1 
+                        then (x `f` (myFoldl1 f xs)) 
+                        else if length (x:xs) == 1
+                              then x
+                              else undefined -- error "Nothing"
+-}
+
+{-
+myFoldl1 :: (a -> a -> a) -> [a] -> a
+myFoldl1 f (x : xs) = if length (x:xs) > 1 
+                        then ((myFoldl1 f xs) `f` x) 
+                        else if length (x:xs) == 1
+                              then x
+                              else undefined -- error "Nothing"
+
+-}
+
+
+
+myFoldl1 :: (a -> a -> a) -> [a] -> a
+myFoldl1 f (x:xs) = let y:ys = reverse (x:xs) in 
+                  if length (y:ys) > 1
+                        then (myFoldl1 f (reverse ys)) `f` y
+                        else if length (y:ys) == 1
+                              then y
+                              else undefined
+
+myFoldr1 :: (a -> a -> a) -> [a] -> a
+myFoldr1 f (x : xs) = if length (x:xs) > 1 
+                        then x `f` (myFoldr1 f xs)
+                        else if length (x:xs) == 1
+                              then x
+                              else undefined -- error "Nothing"
+
+
+
+
 
 
 -- myFoldr1 - правая свертка для не пустых списков (без инициирующего значения)
-
+{-
 myFoldr1 :: (a -> a -> a) -> [a] -> Maybe a
 myFoldr1 _ [] = Nothing
 myFoldr1 f (x:xs) = Just (foldr f x xs)
+-}
 
+{-
+myFoldr1 :: (a -> a -> a) -> [a] -> a
+myFoldr1 f (x : xs) = if length (x:xs) > 1 
+                        then (x `f` (myFoldl1 f xs)) 
+                        else if length (x:xs) == 1
+                              then x
+                              else undefined -- error "Nothing"
+
+-}
 
 
 -- myTakeWhile - реализовать с использованием сверток
