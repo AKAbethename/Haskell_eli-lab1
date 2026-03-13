@@ -198,7 +198,6 @@ myFoldr1 f (x : xs) = if length (x:xs) > 1
 
 
 
-
 -- myFoldr1 - правая свертка для не пустых списков (без инициирующего значения)
 {-
 myFoldr1 :: (a -> a -> a) -> [a] -> Maybe a
@@ -238,12 +237,10 @@ mySpan p = foldl (\b x -> if ((p x) && all p (snd b)) then (((fst b) ++ [x], snd
 
 -- myMaybe - обработка возможно отсутствующего значения или возвращение значение по умолчанию (maybe)
                 
-myMaybe :: b -> (a -> b) -> Maybe a -> b
---myMaybe def _ Nothing = def
---myMaybe _ f (Just x) = f x
 
-myMaybe def f mx = case mx of 
-      Nothing -> def
+myMaybe :: b -> (a -> b) -> Maybe a -> b
+myMaybe b f x = case x of 
+      Nothing -> b
       Just a -> f a
 
 data MyList a = MyEmpty | MyCons a (MyList a)
@@ -278,6 +275,18 @@ myUnFoldr :: (b -> Maybe (a, b)) -> b -> [a]
 myUnFoldr f b = case f b of
       Nothing -> []
       Just (x, newb) -> x : (myUnFoldr f newb)
+
+
+myUnFoldl :: (b -> Maybe (a, b)) -> b -> [a]
+myUnFoldl f b = case (f b) of
+            Nothing -> []
+            Just (x, newb) -> (myUnFoldl f newb) ++ [x]
+
+
+f_help :: Int -> Maybe (Int, Int)
+f_help b  | b >= 1  = Just (1, b-1)
+          | b < 1   = Nothing 
+          | b < 0   = undefined
 
 
 {-
