@@ -67,7 +67,7 @@ myZip [] [] = ([], Right [])
 myZip [] list = ([], Right list)
 myZip list [] = ([], Left list)
 myZip (x:xs) (y:ys) = let (pairs, rest) = myZip xs ys in ((x, y) : pairs, rest)
-
+ 
 -- myUnzipSave - разделение списка пар на пару списков с восстановлением более длинного списка если исходные списки были разного размера
 
 {-
@@ -79,7 +79,7 @@ myUnZip (p:ps, Right []) = ( (fst p) : fst (myUnZip (ps, Right [])) , (snd p) : 
 myUnZip ([], Left list) = (fst (myUnZip ([], Left [])) ++ list, snd (myUnZip ([], Left [])))
 myUnZip ([], Right list) = (fst (myUnZip ([], Right [])), snd (myUnZip ([], Right [])) ++ list)
 myUnZip (p:ps, Left list) = ( (fst p) : fst (myUnZip (ps, Left list)) , (snd p) : snd (myUnZip (ps, Left list)) )
-myUnZip (p:ps, Right list) = ( (fst p) : fst (myUnZip (ps, Right list)) , (snd p) : snd (myUnZip (ps, Right list)) )
+myUnZip (p:ps, Right list) = ( (fst p) : fst (myUnZip (ps, Right list)) , (snd p) : snd (myUnZip (ps, Right list)) )  
 -}
 
 myUnZip :: ([(a, b)], Either [a] [b]) -> ([a], [b])
@@ -90,7 +90,7 @@ myUnZip (p:ps, Right []) = let (list1, list2) = myUnZip (ps, Right []) in ((fst 
 myUnZip ([], Left list) = let (list1, list2) = myUnZip ([], Left []) in (list1 ++ list, list2)
 myUnZip ([], Right list) = let (list1, list2) = myUnZip ([], Right []) in (list1, list2 ++ list)
 myUnZip (p:ps, Left list) = let (list1, list2) = myUnZip (ps, Left list) in ((fst p) : list1, (snd p) : list2)
-myUnZip (p:ps, Right list) = let (list1, list2) = myUnZip (ps, Right list) in ((fst p) : list1, (snd p) : list2)
+myUnZip (p:ps, Right list) = let (list1, list2) = myUnZip (ps, Right list) in ((fst p) : list1, (snd p) : list2) -- O(length p:ps) vs O(1)
 
 myZipSave :: [a] -> [b] -> Either ([(a, b)], [a]) ([(a, b)], [b])
 myZipSave xs ys = local xs ys ([], [])
@@ -475,4 +475,32 @@ myCakeDough = case makeCakeMix Oil Chocolate of
 myCake = chocolateCake myCakeDough Bake
 
 -}
+
+
+{-
+func :: Maybe (a -> b -> c) -> [a] -> [b] -> Maybe [c]
+func z [] [] = case z of
+            Just f -> []
+            Nothing -> Just []
+      
+func z [] (y:ys) = case z of
+            Just f -> func f [] []
+            Nothing -> Just []
+
+func z (x:xs) [] = case z of
+            Just f -> func f [] []
+            Nothing -> []
+
+func z (x:xs) (y:ys) = case z of
+            Just f -> Just (x `f` y) : (func f xs ys)
+            Nothing -> Nothing
+
+
+-}
+
+
+
+func :: Maybe (a -> b -> c) -> [a] -> [b] -> Maybe [c]
+func Nothing _ _ = Nothing
+func (Just f) (x:xs) (y:ys) = Just (zipWith f (x:xs) (y:ys))
 
