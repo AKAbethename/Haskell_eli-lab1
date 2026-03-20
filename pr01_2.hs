@@ -504,3 +504,44 @@ func :: Maybe (a -> b -> c) -> [a] -> [b] -> Maybe [c]
 func Nothing _ _ = Nothing
 func (Just f) (x:xs) (y:ys) = Just (zipWith f (x:xs) (y:ys))
 
+
+
+
+
+
+
+
+
+
+
+
+
+{-
+
+func2 :: Maybe (a -> b) -> (Maybe [Maybe a]) -> (Maybe [Maybe b])
+func2 Nothing _ = Nothing
+func2 (Just f) Nothing = Nothing
+func2 (Just f) (Just []) = Just [Nothing]
+func2 (Just f) (Just (x:xs)) = case x of
+                              Just val -> (Just (f val)) : Just ((func2 (Just f) (Just xs)))
+                              Nothing -> Nothing : (Just (func2 (Just f) (Just xs)))
+
+-}
+
+func2 :: Maybe (a -> b) -> Maybe [Maybe a] -> Maybe [Maybe b]
+func2 Nothing _ = Nothing
+func2 (Just f) Nothing = Nothing
+func2 (Just f) (Just []) = Just []  -- пустой список -> пустой список
+func2 (Just f) (Just (x:xs)) = 
+    case func2 (Just f) (Just xs) of  -- получаем результат для хвоста
+        Nothing -> Nothing
+        Just rest ->
+            case x of
+                Just val -> Just (Just (f val) : rest)
+                Nothing -> Just (Nothing : rest)
+
+
+func2 :: Maybe (a -> b) -> Maybe [Maybe a] -> Maybe [Maybe b]
+func2 (Just f) (Just xs) = Just (map (fmap f) xs)
+func2 _ _ = Nothing
+
