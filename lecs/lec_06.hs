@@ -356,15 +356,20 @@ xs <&> f = f <$> xs
 -}
 
 
-
+{-
 instanse Functor Box where
 
 fmap (\x -> x) (Box 3) ≡ (\x -> x) (Box 3)
 fmap ((+1) . (*2)) (Box 4) ≡ fmap (+1) $ fmap (*2) (Box 4)
 
+-}
+
 -- Определим представителя Functor для Box
 --instance Functor Box where
 --    ...
+
+instance Functor Box where
+    fmap f (Box x) = Box (f x)
 
 {-
 Проверка законов функтора:

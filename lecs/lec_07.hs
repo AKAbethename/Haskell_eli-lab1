@@ -103,15 +103,19 @@ parserName = ParserConstructor function where
                 🠗         🠗           🠗
 имяПарсера :: Парсер ПринимаетЧар СтруктураЧар
 
-                    Parser     [tok] -> Maybe ([tok], a)
+                    Parser     [tok] -> Maybe ([tok], a) - тип функции
                       🠗              🠗
 имяПарсера = КонструкторПарсера   стрелка where -- парсер - это конструктор парсера, содержащий в себе стрелку (функцию), которая
     стрелка (разбиваем входной поток на голову и хвост) если голова потока эот буква 'A' то собираем структуру возможного значения с парой из неразобранной части строки и буквой 'A'
     стрелка в противном случае является неудачным парсингом и возвращаем отсутствующее значение
 -}
 
--- charA :: ...
--- charA = ...
+charA :: Parser Char Char 
+charA = Parser f where
+--  f :: [Char] -> Maybe ([Char], Char)
+    f (x:xs) | x == 'A' = Just (xs, 'A')
+    f _                = Nothing
+
 
 {-
 Получили простой парсер, который может определить является ли первый символ символом 'A' или нет
@@ -123,6 +127,8 @@ parserName = ParserConstructor function where
 
 Запуск парсера:
 runParser parserName InputStream
+
+(runParser charA) "ABX"  запуск на лекции
 
 
 Например:
@@ -160,8 +166,11 @@ runParser charA "ABC"
 Предикаты работаю не только с Char, так что можно использовать полиморфный тип
 -}
 
--- satisfy :: ...
--- satisfy ...
+satisfy :: (Char -> Bool) -> Parser Char Char
+satisfy p = Parser f where
+--  f :: [Char] -> Maybe ([Char], Char)
+    f (x:xs) | p x = Just (xs, x)
+    f _                = Nothing
 
 {-
 Унарные предикаты из Data.Char для парсинга символов:
@@ -180,13 +189,24 @@ runParser (satisfy isDigit) "ABC"
 
 Можно обобщить парсер для анализа любой буквы по выбору:
 -}
---char :: ...
+
+char :: Char -> Parser Char Char 
+char c = Parser f where
+--    f :: [Char] -> Maybe ([Char], Char)
+    f (x:xs) | x == c = Just (xs, c)
+    f _                = Nothing
+
 --char ...
 -- runParser (char 'a') "asd"
 
 --lower ::...
 --lower = ...
 -- runParser lower "asd"
+
+lower :: Parser Char Char
+lower = Parser f where
+    f (x:xs) | isLower x = Just (xs, 'A')
+    f _                = Nothing
 
 
 
@@ -238,20 +258,35 @@ fmap :: (a -> b) -> f a -> f b
 --    fmap :: (a -> b) -> Parser tok a -> Parser tok b
 --    fmap ...
 
+
+instance Functor (Parser tok) where
+    fmap :: (a -> b) -> Parser tok a -> Parser tok b
+    fmap g (Parser u) = Parser f where
+        -- f :: [tok] -> Maybe ([tok], b)
+        f xs = case u xs of
+            Nothing -> Nothing
+            Just (toks', x) -> Just (toks', g x)
+
+
 {-
 
 Parser - это последовательная композиция трех функторов:
     (->) [tok], Maybe и (,) [tok]
 Значит можно реализовать представителя через fmap и переупаковку:
-    ...
+    Parser ()
     или
     ...
+
+fmap g (Parser u) = Parser $ (fmap . fmap . fmap) g . runParser
 
 
 Соберем парсер для цифр с использованием функторов:
 -}
 --digit :: Parser Char Int
 --digit = ...
+
+digit :: Parser Char Int
+digit = digitToInt <$> satisfy isDigit
 
 {-
 runParser digit "12AB"
@@ -282,6 +317,9 @@ runParser digit "AB12"
 -}
 
 --instance Applicative (Parser tok) where
+
+
+
 {-
 без эффектное вычисление - строка не обрабатывается и вместе со значением кладется в упаковку
 В конструктор парсера упаковывается стрелка (написанная, например через лямбду)
@@ -290,6 +328,9 @@ runParser (pure 42) "ABCD"
 -}
 --    pure :: a -> Parser tok a
 --    pure x = ...
+instance Applicative (Parser tok) where
+    pure :: a -> Parser tok a
+    pure x = Parser $ \xs -> Just (xs, x)
 
 {-
 В конструктор парсера упаковывается стрелка, которая
@@ -304,12 +345,23 @@ runParser (pure 42) "ABCD"
 --    (<*>) :: Parser tok (a -> b) -> Parser tok a -> Parser tok b
 --    Parser u (<*>) Parser v = ...
 
+    (<*>) :: Parser tok (a -> b) -> Parser tok a -> Parser tok b
+    Parser u <*> Parser v = Parser f where
+        f xs = case u xs of
+            Nothing -> Nothing
+            Just (tok, x) -> case v tok of
+                Nothing -> Nothing
+                Just (tok', x') -> Just (tok', x x')
+
 
 {-
 Соберем простой парсер на основе аппликатива для разбора строки типа: "2*3"
 -}
 -- multiplication :: ...
 -- multiplication = ...
+
+multiplication :: Parser Char Int
+multiplication = (*) <$> digit <* char '*' <*> digit
 {-
 runParser multiplication "2*3"
 runParser multiplication "g*3"
@@ -395,6 +447,7 @@ ZipList "abc" <|> ZipList "ABCDEFG"
 -}
 
 --instance Alternative (Parser tok) where
+
 {-
 Пустой парсер не должен мешать успешным вычислениями
 Поэтому метод empty игнорирует входной поток и убивает вычисление отсутствующим значением
@@ -402,12 +455,21 @@ ZipList "abc" <|> ZipList "ABCDEFG"
 --    empty :: Parser tok a
 --    empty = ...
 
+instance Alternative (Parser tok) where
+    empty :: Parser tok a
+    empty = Parser $ \_ -> Nothing
+
 {-
 Если результат первого парсера валидный, то возвращаем его, в противном случае возвращаем второй парсер
 -}
 --    (<|>) :: Parser tok a -> Parser tok a -> Parser tok a
 --    Parser u <|> Parser v = ...
 
+(<|>) :: Parser tok a -> Parser tok a -> Parser tok a
+Parser u <|> Parser v = Parser f where
+    f xs = case u xs of 
+        Nothing -> v xs
+        x -> x
 
 -- runParser  (char 'A' <|> char 'B') "ABC"
 -- runParser  (char 'A' <|> char 'B') "BCD"
@@ -425,8 +487,9 @@ ZipList "abc" <|> ZipList "ABCDEFG"
 
 Такой рекурсивный парсер из конструктора строк, парсера нижних символов, рекурсивного вызова, терминирующего парсера без эффектов
 -}
---lowers :: Parser Char String
---lowers = ...
+
+lowers :: Parser Char String
+lowers = (:) <$> lower <*> lowers Lec07.<|> pure ""
 
 -- runParser lowers "abGHdef"
 -- runParser lowers "abdef"
