@@ -1,15 +1,32 @@
--------------------------------------
--- Практические задание 2. Часть 1 --
--------------------------------------
-
-module Pr02_1 where
+--import qualified Data.Random as R
 
 {-
+data MyEvolution = LUCA "Last Universal Common Ancestor" | Cyanobacteria "Synechococcus" | Trilobite "Paradoxides" | 
+                 Ichthyostega "Ichthyostega" | Dimetrodon "Dimetrodon" | Archaeopteryx "Archaeopteryx" | Morganucodon "Morganucodon" |
+                Purgatorius "Purgatorius" | Australopithecine "Australopithecus Afarensis" | Humans "Homo Sapiens" deriving Show
+-}
 
-1. Создайте и настройте проект MyEvolProject в Cabal
-Добавьте дополнительную зависимость в проект: random
-Создайте новый модуль MyEvolModule.hs в папке app
+data MyEvolution = LUCA | Cyanobacteria | Trilobite | Ichthyostega | Dimetrodon | Archaeopteryx | Morganucodon | Purgatorius | Australopithecine | Humans
 
+instance Show MyEvolution where
+    show LUCA = "Last Universal Common Ancestor"
+    show Cyanobacteria = "Synechococcus"
+    show Trilobite = "Paradoxides"
+    show Ichthyostega = "Ichthyostega"
+    show Dimetrodon = "Dimetrodon"
+    show Archaeopteryx = "Archaeopteryx"
+    show Morganucodon = "Morganucodon"
+    show Purgatorius = "Purgatorius"
+    show Australopithecine = "Australopithecus Afarensis"
+    show Humans = "Homo Sapiens"
+
+instance Read MyEvolution where
+    readsPrec
+
+-- readsPrec :: Int -> ReadS a
+
+
+{-
 
 
 2. Задайте тип-сумму MyEvolution в MyEvolModule.hs со следующими конструкторами и соответствующими строками (для класса типов Show):
@@ -33,12 +50,3 @@ Humans              | "Homo Sapiens"
 Добавьте в функцию main файла Main.hs вывод отсортированного списка значений типа MyEvolution. Используйте следующий код: putStrLn $ show $ sort ([...] :: [MyEvolution])
 
 -}
-
-
-printDouble :: Int -> String
-printDouble x = show $ x * 2
-
-
-func :: String -> Int
-func str = read str :: Int
-
