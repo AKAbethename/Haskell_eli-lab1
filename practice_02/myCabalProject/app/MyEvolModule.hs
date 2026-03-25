@@ -1,4 +1,6 @@
---import qualified Data.Random as R
+module MyEvolModule where
+
+import qualified Data.Random as R
 
 {-
 data MyEvolution = LUCA "Last Universal Common Ancestor" | Cyanobacteria "Synechococcus" | Trilobite "Paradoxides" | 
@@ -29,13 +31,13 @@ instance Read MyEvolution where
         'L' : 'a' : 's' : 't' : ' ' :
          'U' : 'n' : 'i' : 'v' : 'e' : 'r' : 's' : 'a' : 'l' : ' ' 
          : 'C' : 'o' : 'm' : 'm' : 'o' : 'n' : ' ' 
-         : 'A' : 'n' : 'c' : 'e' : 's' : 't' : 'o' : 'r' : rest -> [(LUCA, "")]
+         : 'A' : 'n' : 'c' : 'e' : 's' : 't' : 'o' : 'r' : rest -> [(LUCA, rest)]
         
-        'S' : 'y' : 'n' : 'e' : 'c' : 'h' : 'o' : 'c' : 'o' : 'c' : 'c' : 'u' : 's' : rest -> [(Cyanobacteria, "")]
+        'S' : 'y' : 'n' : 'e' : 'c' : 'h' : 'o' : 'c' : 'o' : 'c' : 'c' : 'u' : 's' : rest -> [(Cyanobacteria, rest)]
 
-        'P' : 'a' : 'r' : 'a' : 'd' : 'o' : 'x' : 'i' : 'd' : 'e' : 's' : rest -> [(Trilobite, "")]
+        'P' : 'a' : 'r' : 'a' : 'd' : 'o' : 'x' : 'i' : 'd' : 'e' : 's' : rest -> [(Trilobite, rest)]
         
-        'I' : 'c' : 'h' : 't' : 'h' : 'y' : 'o' : 's' : 't' : 'e' : 'g' : 'a' : rest -> [(Ichthyostega, "")]
+        'I' : 'c' : 'h' : 't' : 'h' : 'y' : 'o' : 's' : 't' : 'e' : 'g' : 'a' : rest -> [(Ichthyostega, rest)]
 
         'D' : 'i' : 'm' : 'e' : 't' : 'r' : 'o' : 'd' : 'o' : 'n' : rest  -> [(Dimetrodon, rest)]
     
@@ -169,24 +171,36 @@ max x y = if x <= y then y else x
 min x y = if x <= y then x else y
 -}
 
+instance Enum MyEvolution where
+    toEnum 0 = LUCA
+    toEnum 1 = Cyanobacteria
+    toEnum 2 = Trilobite
+    toEnum 3 = Ichthyostega
+    toEnum 4 = Dimetrodon
+    toEnum 5 = Archaeopteryx
+    toEnum 6 = Morganucodon 
+    toEnum 7 = Purgatorius
+    toEnum 8 = Australopithecine
+    toEnum 9 = Humans
+    fromEnum LUCA = 0
+    fromEnum Cyanobacteria = 1
+    fromEnum Trilobite = 2
+    fromEnum Ichthyostega = 3
+    fromEnum Dimetrodon = 4
+    fromEnum Archaeopteryx = 5
+    fromEnum Morganucodon = 6
+    fromEnum Purgatorius = 7
+    fromEnum Australopithecine = 8
+    fromEnum Humans = 9
+
+instance Bounded MyEvolution where
+    minBound = LUCA
+    maxBound = Humans
 
 
+{- MyEvolution' -}
 
-instance Enum SixSidedDie' where
-    toEnum 0 = S1'
-    toEnum 1 = S2'
-    toEnum 2 = S3'
-    toEnum 3 = S4'
-    toEnum 4 = S5'
-    toEnum 5 = S6'
-    fromEnum S1' = 0
-    fromEnum S2' = 1
-    fromEnum S3' = 2
-    fromEnum S4' = 3
-    fromEnum S5' = 4
-    fromEnum S6' = 5
-
-
+data MyEvolution' = LUCA' | Cyanobacteria' | Trilobite' | Ichthyostega' | Dimetrodon' | Archaeopteryx' | Morganucodon' | Purgatorius' | Australopithecine' | Humans' deriving (Show, Read, Eq, Ord, Enum, Bounded)
 
 {-
 
@@ -214,43 +228,3 @@ Humans              | "Homo Sapiens"
 -}
 
 
-data SixSidedDie' = S1' | S2' | S3' | S4' | S5' | S6'
-
-{-
-Класс типов Show
-Преобразует значение в строку и может вывести ее на экран
-:i Show
-...
-instance Show SixSidedDie' -- Defined at lec_05.hs:290:10
-...
-Представитель Show:
--}
-instance Show SixSidedDie' where
-    show S1' = "One"
-    show S2' = "Two"
-    show S3' = "Three"
-    show S4' = "Four"
-    show S5' = "Five"
-    show S6' = "Six"
-
-myDie = S6'
--- myDie
-
-{-
-Класс типов Read
-Обратное преобразование строк в значения
--}
-instance Read SixSidedDie' where
-    readsPrec _ str = case str of
-        'r':'o':'l':'l':' ':'o':'n':'e':rest          -> [(S1',  rest)]
-        'r':'o':'l':'l':' ':'t':'w':'o':rest          -> [(S2',  rest)]
-        'r':'o':'l':'l':' ':'t':'h':'r':'e':'e':rest  -> [(S3',  rest)]
-        'r':'o':'l':'l':' ':'f':'o':'u':'r':rest      -> [(S4',  rest)]
-        'r':'o':'l':'l':' ':'f':'i':'v':'e':rest      -> [(S5',  rest)]
-        'r':'o':'l':'l':' ':'s':'i':'x':rest          -> [(S6',  rest)]
-
-
-
-
--- (read "roll two")
--- (read "roll two") :: SixSidedDie'

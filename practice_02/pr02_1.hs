@@ -39,6 +39,4 @@ printDouble :: Int -> String
 printDouble x = show $ x * 2
 
 
-func :: String -> Int
-func str = read str :: Int
 
