@@ -1,5 +1,7 @@
 module MyMaybeMod where
 
+import Data.Semigroup
+
 data MyMaybe a = MyNothing | MyJust a deriving (Show, Eq)
 
 -- тип MyMaybe, аналогичный стандартному Maybe. Сделайте этот тип представителем классов типов
@@ -42,10 +44,37 @@ instance Semigroup a => Monoid (MyMaybe a) where
 
 
 
+data Color = Red | Yellow | Blue | Green | Purple | Orange | Brown | Alpha deriving (Show, Eq)
+
+instance Semigroup Color where
+  (<>) Red    Blue    = Purple
+  (<>) Blue   Red     = Purple
+  (<>) Yellow Blue    = Green
+  (<>) Blue   Yellow  = Green
+  (<>) Yellow Red     = Orange
+  (<>) Red    Yellow  = Orange
+
+  (<>) Red    Alpha   = Red 
+  (<>) Yellow Alpha   = Yellow 
+  (<>) Blue   Alpha   = Blue 
+  (<>) Green  Alpha   = Green 
+  (<>) Purple Alpha   = Purple 
+  (<>) Orange Alpha   = Orange 
+  (<>) Brown  Alpha   = Brown 
+  (<>) Alpha  Red     = Red 
+  (<>) Alpha  Yellow  = Yellow 
+  (<>) Alpha  Blue    = Blue 
+  (<>) Alpha  Green   = Green 
+  (<>) Alpha  Purple  = Purple 
+  (<>) Alpha  Orange  = Orange 
+  (<>) Alpha  Brown   = Brown 
+
+
+
 -- Многострочный комментарий
 {-
 
-- fold, foldMap, foldr   ------
+- fold, foldMap, foldr   ------ DONE
 - (<>), sconcat, stimes   -----
 - mappend, mconcat    ------
 - fmap, (<$)    -----
@@ -61,3 +90,19 @@ instance Semigroup a => Monoid (MyMaybe a) where
 --4
 --ghci> foldr (\x y -> x * y) 2 t
 --8
+
+-- foldMap
+--ghci> t = MyNothing
+--ghci> foldMap (\x -> show x) t
+--""
+--ghci> t = MyJust 10
+--ghci> foldMap (\x -> show x) t
+--"10"
+
+
+-- foldr
+--ghci> t
+--MyJust 10
+--ghci> foldr (\x y -> x + y) 2 t
+--12
+
