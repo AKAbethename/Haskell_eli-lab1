@@ -66,16 +66,26 @@ instance Foldable MyTree where
 
 
 instance Applicative MyTree where
-    pure x = MyLeaf x
+    pure x = y where y = MyNode y x y
 
+    (<*>) _ MyEmpty = MyEmpty
+    (<*>) (MyLeaf f) (MyLeaf x) = MyLeaf (f x)
+    (<*>) (MyNode (treefL) f (treefR)) ((MyLeaf x)) = MyLeaf (f x)
+    MyNode fl f fr <*> MyNode xl x xr = MyNode (fl <*> xl) (f x) (fr <*> xr)
+
+{-
     (<*>) MyEmpty _ = MyEmpty
     (<*>) (MyLeaf f) (MyLeaf x) = MyLeaf (f x)
     (<*>) (MyLeaf f) (MyNode treeL x treeR) = MyNode ((<*>) (MyLeaf f) treeL) (f x) ((<*>) (MyLeaf f) treeR)
 
     (<*>) (MyNode treefL f treefR) (MyLeaf x) = MyNode ((<*>) treefL (MyLeaf x)) (f x) ((<*>) treefR (MyLeaf x))
 
-    (<*>) (MyNode treefL f treefR) (MyNode treeL x treeR) =
-                MyNode ((<*>) (MyNode treefL f treefR) treeL ) (f x) ((<*>) (MyNode treefL f treefR) treeR)
+--    (<*>) (MyNode treefL f treefR) (MyNode treeL x treeR) =
+--                MyNode ((<*>) (MyNode treefL f treefR) treeL ) (f x) ((<*>) (MyNode treefL f treefR) treeR)
+
+-}
+
+    
 
 
 
@@ -92,10 +102,8 @@ data Tree a = Empty
 -- Многострочный комментарий
 {-
 
-- fold, foldMap, foldr
-- (<>), sconcat, stimes
-- mappend, mconcat
-- fmap, (<$)
+- fold, foldMap, foldr -- DONE
+- fmap, (<$)  -- DONE
 - pure, (<*>), liftA2, (*>), (<*)
 
 -}
@@ -110,14 +118,45 @@ data Tree a = Empty
 --ghci> foldr (\x y -> x * y) 1 tree
 --60
 
+-- foldl
+
+-- ghci> tree = MyNode (MyLeaf 3) 5 (MyLeaf 4)
+-- ghci> foldl (\x y -> x - y) 0 tree
+-- -12
 
 
---ghci> foldMap (\x -> show x) tree
---"532"
+-- foldMap
 
---ghci> tree = Node 5 [Node 4 [], Node 3 []]
---ghci> (<$) 2 tree
---Node {value = 2, subforest = [Node {value = 2, subforest = []},Node {value = 2, subforest = []}]}
+-- ghci> tree
+-- MyNode (MyLeaf 3) 5 (MyLeaf 4)
+-- ghci> foldMap (\x -> show x) tree
+-- "453"
+
+
+-- fmap
+
+--ghci> tree
+--MyNode (MyLeaf 3) 5 (MyLeaf 4)
+--ghci> fmap (\x -> x+5) tree
+--MyNode (MyLeaf 8) 10 (MyLeaf 9)
+
+
+-- (<$)
+
+--MyNode (MyLeaf 3) 5 (MyLeaf 4)
+--ghci> (<$) 505 tree
+--MyNode (MyLeaf 505) 505 (MyLeaf 505)
+
+
+-- pure
+
+
+-- (<*>)
+
+--ghci> treef = MyNode (MyLeaf (*2)) (*4) (MyLeaf (*3))
+--ghci> tree = MyNode (MyLeaf 2) 4 (MyLeaf 3)
+--ghci> treef <*> tree
+--MyNode (MyLeaf 4) 16 (MyLeaf 9)
 
 
 
