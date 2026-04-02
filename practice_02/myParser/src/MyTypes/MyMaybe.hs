@@ -33,9 +33,9 @@ instance Applicative MyMaybe where
 
 instance Semigroup a => Semigroup (MyMaybe a) where
     -- minimal - (<>)
-    (<>) MyNothing b = b
-    (<>) a MyNothing = a
-    (<>) (MyJust x) (MyJust y) = MyJust ((<>) x y)
+    MyNothing <> b = b
+    a <> MyNothing = a
+    (MyJust x) <> (MyJust y) = MyJust (x <> y)
 
 
 instance Semigroup a => Monoid (MyMaybe a) where
@@ -75,10 +75,10 @@ instance Semigroup Color where
 {-
 
 - fold, foldMap, foldr   ------ DONE
-- (<>), sconcat, stimes   -----
-- mappend, mconcat    ------
-- fmap, (<$)    -----
-- pure, (<*>), liftA2, (*>), (<*)   -------
+- (<>), sconcat, stimes   -----  Done
+- mappend, mconcat    ------  DONE
+- fmap, (<$)    -----  DONE
+- pure, (<*>), liftA2, (*>), (<*)   ------- DONE
 
 -}
 
@@ -105,4 +105,80 @@ instance Semigroup Color where
 --MyJust 10
 --ghci> foldr (\x y -> x + y) 2 t
 --12
+
+
+-- (<>)
+
+--ghci> MyJust "Hello" <> MyJust " World"
+--MyJust "Hello World"
+
+
+-- stimes
+
+--ghci> stimes 3 (MyJust "eli")
+--MyJust "elielieli"
+
+
+-- sconcat
+
+--ghci> import Data.List.NonEmpty
+--ghci> objs = MyJust "Hello" :| [MyNothing, MyJust " World"]
+--ghci> sconcat objs
+--MyJust "Hello World"
+
+
+
+-- mappend
+
+--ghci>  MyJust "Hello" `mappend` MyNothing
+--MyJust "Hello"
+
+
+-- mconcat
+
+--ghci> mconcat [MyJust "ha", MyJust " eli"]
+--MyJust "ha eli"
+
+
+
+-- fmap
+
+--ghci> fmap (\x -> x + 10) (MyJust 2)
+--MyJust 12
+
+
+-- (<$)
+
+--ghci> (<$) 505 MyJust 12
+--505
+
+
+-- pure and (<*>)
+
+--ghci> (pure (\x -> x + 10)) <*> (MyJust 2)
+--MyJust 12
+
+
+-- liftA2
+
+--ghci> liftA2 (\x y -> x + y + 1) (MyJust 10) (MyJust 20)
+--MyJust 31
+
+
+-- (<*)
+
+--ghci> (<*) (MyJust 10) (MyJust 20)
+--MyJust 10
+
+
+-- (*>)
+
+--ghci> (*>) (MyJust 10) (MyJust 20)
+--MyJust 20
+
+
+
+
+
+
 
