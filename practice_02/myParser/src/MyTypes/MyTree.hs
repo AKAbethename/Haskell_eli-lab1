@@ -148,7 +148,13 @@ data Tree a = Empty
 --MyNode (MyLeaf 505) 505 (MyLeaf 505)
 
 
--- pure
+-- pure and (<*>)
+
+--ghci> f = pure (\x -> x + 5)
+--ghci> (<*>) f (MyNode (MyEmpty) 5 MyEmpty)
+--MyNode MyEmpty 10 MyEmpty
+--ghci> fmap (\x -> x + 5) (MyNode (MyEmpty) 5 MyEmpty)
+--MyNode MyEmpty 10 MyEmpty
 
 
 -- (<*>)
@@ -157,6 +163,36 @@ data Tree a = Empty
 --ghci> tree = MyNode (MyLeaf 2) 4 (MyLeaf 3)
 --ghci> treef <*> tree
 --MyNode (MyLeaf 4) 16 (MyLeaf 9)
+
+
+-- liftA2
+
+--ghci> tree1
+--MyNode (MyLeaf 3) 5 (MyLeaf 4)
+--ghci> tree2
+--MyNode (MyLeaf 1.4) 3.3 (MyLeaf 2.2)
+--ghci> liftA2 (\x y -> x * y) tree1 tree2
+--MyNode (MyLeaf 4.199999999999999) 16.5 (MyLeaf 8.8)
+
+
+-- (*>)
+
+--ghci> tree1
+--MyNode (MyLeaf 3) 5 (MyLeaf 4)
+--ghci> tree2
+--MyNode (MyLeaf 1.4) 3.3 (MyLeaf 2.2)
+--ghci> (*>) tree1 tree2
+--MyNode (MyLeaf 1.4) 3.3 (MyLeaf 2.2)
+
+
+-- (<*)
+
+-- ghci> (<*) tree1 tree2
+-- MyNode (MyLeaf 3) 5 (MyLeaf 4)
+
+
+
+{- --------------------------------------------------- THAT'S IT ----------------------------------------------------- -}
 
 
 
