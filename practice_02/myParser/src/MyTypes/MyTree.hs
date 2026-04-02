@@ -4,6 +4,8 @@ module MyTreeMod where
 
 import Data.Semigroup
 
+{-
+
 data MyTree a = Node {
         value :: a,       
         subforest :: MyForest a  
@@ -38,6 +40,43 @@ instance Applicative MyTree where
 
     Node f tfs <*> tx@(Node x txs) = Node (f x) (map (f <$>) txs ++ map (<*> tx) tfs)
 
+-}
+
+data MyTree a = MyEmpty | MyLeaf a | MyNode (MyTree a) a (MyTree a) deriving (Show, Eq)
+
+
+instance Functor MyTree where
+    fmap _ MyEmpty = MyEmpty
+    fmap f (MyLeaf x) = MyLeaf (f x)
+    fmap f (MyNode treeL y treeR) = MyNode (fmap f treeL) (f y) (fmap f treeR)
+
+instance Foldable MyTree where
+
+    foldl f x MyEmpty = x
+    foldl f x (MyLeaf y) = f x y
+    foldl f x (MyNode treeL y treeR) = foldl f (f (foldl f x treeL) y) treeR
+
+
+--    foldr f y tree = (foldl (flip f) y tree)
+
+    foldr f y MyEmpty = y
+    foldr f y (MyLeaf x) = f x y
+    foldr f y (MyNode treeL x treeR) = foldr f (f x (foldr f y treeL)) treeR
+
+
+
+instance Applicative MyTree where
+    pure x = MyLeaf x
+
+    (<*>) MyEmpty _ = MyEmpty
+    (<*>) (MyLeaf f) (MyLeaf x) = MyLeaf (f x)
+    (<*>) (MyLeaf f) (MyNode treeL x treeR) = MyNode ((<*>) (MyLeaf f) treeL) (f x) ((<*>) (MyLeaf f) treeR)
+
+    (<*>) (MyNode treefL f treefR) (MyLeaf x) = MyNode ((<*>) treefL (MyLeaf x)) (f x) ((<*>) treefR (MyLeaf x))
+
+    (<*>) (MyNode treefL f treefR) (MyNode treeL x treeR) =
+                MyNode ((<*>) (MyNode treefL f treefR) treeL ) (f x) ((<*>) (MyNode treefL f treefR) treeR)
+
 
 
 {-
@@ -61,13 +100,17 @@ data Tree a = Empty
 
 -}
 
---ghci> tree = Node 5 [Node 3 [], Node 2 []]
---ghci> foldl (\x y -> x + y) 0 tree
---10
+-- foldr
 
---foldr :: Foldable t => (a -> b -> b) -> b -> t a -> b
+--ghci> tree = MyNode (MyLeaf 4) 5 (MyLeaf 3)
+--ghci> tree
+--MyNode (MyLeaf 4) 5 (MyLeaf 3)
 --ghci> foldr (\x y -> x + y) 0 tree
---10
+--12
+--ghci> foldr (\x y -> x * y) 1 tree
+--60
+
+
 
 --ghci> foldMap (\x -> show x) tree
 --"532"
@@ -91,6 +134,18 @@ data Tree a = Empty
 --        Node {value = 7, subforest = []}]},
 --        Node {value = 8, subforest = [Node {value = 7, subforest = []},
 --        Node {value = 6, subforest = []}]}]}
+
+
+--ghci> tree
+--MyNode (MyLeaf 2) 4 (MyLeaf 3)
+--ghci> treef_show = MyNode (MyLeaf "*2") "*4" (MyLeaf "*3")
+--ghci> treef_show
+--MyNode (MyLeaf "*2") "*4" (MyLeaf "*3")
+--ghci> tree
+--MyNode (MyLeaf 2) 4 (MyLeaf 3)
+--ghci> treef <*> tree
+--MyNode (MyNode (MyLeaf 4) 8 (MyLeaf 6)) 16 (MyNode (MyLeaf 6) 12 (MyLeaf 9))
+
 
 
 --ghci> tree
