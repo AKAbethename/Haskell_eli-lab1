@@ -39,3 +39,25 @@ instance Semigroup a => Semigroup (MyMaybe a) where
 instance Semigroup a => Monoid (MyMaybe a) where
     -- mempty or mconcat
     mempty = MyNothing
+
+
+
+-- Многострочный комментарий
+{-
+
+- fold, foldMap, foldr   ------
+- (<>), sconcat, stimes   -----
+- mappend, mconcat    ------
+- fmap, (<$)    -----
+- pure, (<*>), liftA2, (*>), (<*)   -------
+
+-}
+
+
+-- fold
+--ghci> t
+--MyJust 4
+--ghci> foldr (\x y -> x * y) 1 t
+--4
+--ghci> foldr (\x y -> x * y) 2 t
+--8

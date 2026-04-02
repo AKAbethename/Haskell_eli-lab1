@@ -38,19 +38,7 @@ instance Applicative MyTree where
 
     Node f tfs <*> tx@(Node x txs) = Node (f x) (map (f <$>) txs ++ map (<*> tx) tfs)
 
-  --  Node f tfs <*> Node x txs = Node (f x) (map (f <$>) txs ++ map)
 
-{-
-    
-    (<*>) (Node f []) (Node x []) = Node (f x) []
-
-    (<*>) (Node f list) (Node x []) = Node (f x) []
-
-    (<*>) (Node f []) (Node x (l:ls)) = Node (f x) (l:ls)
-
-    (<*>) (Node f (tf:tfs)) (Node x (tx:txs)) = Node (f x) ((map (f <$>) (tx:txs)) ++ ((<*>) tf tx))
-
--}
 
 {-
 data Tree a = Empty
@@ -84,6 +72,10 @@ data Tree a = Empty
 --ghci> foldMap (\x -> show x) tree
 --"532"
 
+--ghci> tree = Node 5 [Node 4 [], Node 3 []]
+--ghci> (<$) 2 tree
+--Node {value = 2, subforest = [Node {value = 2, subforest = []},Node {value = 2, subforest = []}]}
+
 
 
 --ghci> tree1 = pure 6
@@ -99,6 +91,43 @@ data Tree a = Empty
 --        Node {value = 7, subforest = []}]},
 --        Node {value = 8, subforest = [Node {value = 7, subforest = []},
 --        Node {value = 6, subforest = []}]}]}
+
+
+--ghci> tree
+--Node {value = 5, subforest = [Node {value = 4, subforest = []},Node {value = 3, subforest = []}]}
+--ghci> tree2 = Node 10 [Node 9 [], Node 8 []]
+--ghci> liftA2 (\x y -> x ** y) tree tree2
+--    Node {value = 9765625.0, subforest = [Node {value = 1953125.0, subforest = []},
+--    Node {value = 390625.0, subforest = []},
+--    Node {value = 1048576.0, subforest = [Node {value = 262144.0, subforest = []},
+--    Node {value = 65536.0, subforest = []}]},
+--    Node {value = 59049.0, subforest = [Node {value = 19683.0, subforest = []},
+--    Node {value = 6561.0, subforest = []}]}]}
+
+
+
+--ghci> tree
+--Node {value = 5, subforest = [Node {value = 4, subforest = []},Node {value = 3, subforest = []}]}
+--ghci> tree2
+--Node {value = 10, subforest = [Node {value = 9, subforest = []},Node {value = 8, subforest = []}]}
+--ghci> (*>) tree tree2
+--Node {value = 10, subforest = [Node {value = 9, subforest = []},
+--    Node {value = 8, subforest = []},
+--    Node {value = 10, subforest = [Node {value = 9, subforest = []},
+--    Node {value = 8, subforest = []}]},
+--    Node {value = 10, subforest = [Node {value = 9, subforest = []},
+--    Node {value = 8, subforest = []}]}]}
+
+
+
+--ghci> (<*) tree tree2
+--Node {value = 5, subforest = [Node {value = 5, subforest = []},
+--    Node {value = 5, subforest = []},
+--    Node {value = 4, subforest = [Node {value = 4, subforest = []},
+--    Node {value = 4, subforest = []}]},
+--    Node {value = 3, subforest = [Node {value = 3, subforest = []},
+--    Node {value = 3, subforest = []}]}]}
+
 
 --ghci> tree = Node 5 [Node 3 [], Node 2 []]
 --ghci> fmap (*2) tree
