@@ -3,28 +3,44 @@ module MyParsers.ParsecEli where
 import MyTypes.MyMaybe
 
 import Text.Parsec
-import Text.Parsec.String (Parser)  -- Parser для String
+import Text.Parsec.String (Parser) 
 import Data.Char (isLower, isUpper, digitToInt, isDigit)
-import Control.Applicative (Alternative(..), optional, ZipList(..))
+-- import Control.Applicative (Alternative(..), optional, ZipList(..))
+import qualified Control.Applicative as App
 
-charA :: Parser Char
-charA = char 'A'
-
-
-mySatisfy :: (Char -> Bool) -> Parser Char
-mySatisfy p = satisfy p
-
-myChar :: Char -> Parser Char
-myChar c = char c
+charAParsec :: Parser Char
+charAParsec = char 'A'
 
 
-myLower :: Parser Char
-myLower = lower  
+satisfyParsec :: (Char -> Bool) -> Parser Char
+satisfyParsec p = satisfy p
+
+charParsec :: Char -> Parser Char
+charParsec c = char c
 
 
-myDigit :: Parser Int
-myDigit = digitToInt <$> digit
+lowerParsec :: Parser Char
+lowerParsec = lower  
 
+
+digitParsec :: Parser Int
+digitParsec = digitToInt <$> digit
+
+digitsParsec :: Parser Int
+digitsParsec = read <$> many1 digit
+
+
+-- Парсер для умножения
+finalMultParsec :: Parser Int
+finalMultParsec = (*) <$> digitsParsec <* char '*' <*> digitsParsec
+
+-- Парсер для сложения
+finalPlusParsec :: Parser Int
+finalPlusParsec = (+) <$> digitsParsec <* char '+' <*> digitsParsec
+
+
+plusOrMultParsec :: Parser Int  -- было Parser Char Int
+plusOrMultParsec = finalMultParsec <|> finalPlusParsec
 
 runParser :: Parser a -> String -> MyMaybe (String, a)
 runParser p input = 
