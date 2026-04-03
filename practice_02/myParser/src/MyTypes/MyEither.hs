@@ -1,4 +1,4 @@
-module MyEitherMod where
+module MyTypes.MyEither where
 
 data MyEither a b = MyLeft a | MyRight b deriving (Show, Eq)
 

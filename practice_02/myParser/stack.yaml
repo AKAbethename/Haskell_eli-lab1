@@ -65,3 +65,12 @@ packages:
 #
 # Allow a newer minor version of GHC than the snapshot specifies
 # compiler-check: newer-minor
+
+
+extra-deps:
+- attoparsec-0.14.4
+- text-2.1.2
+- primitive-0.9.1.0
+- hashable-1.5.1.0
+- scientific-0.3.8.1
+- parsec-3.1.18.0@sha256:dfbb9835b8abc966b6bbd34340ef5122227b4cf4480062b85ca4c4704f054f98,4535

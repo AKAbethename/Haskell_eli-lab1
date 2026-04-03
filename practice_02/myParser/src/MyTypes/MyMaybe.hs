@@ -1,4 +1,4 @@
-module MyMaybeMod where
+module MyTypes.MyMaybe where
 
 import Data.Semigroup
 

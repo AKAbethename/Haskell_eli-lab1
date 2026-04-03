@@ -26,6 +26,12 @@ source-repository head
 library
   exposed-modules:
       Lib
+      MyParsers.AttoparsecEli
+      MyParsers.ParsecEli
+      MyParsers.ParserEli
+      MyTypes.MyEither
+      MyTypes.MyMaybe
+      MyTypes.MyTree
   other-modules:
       Paths_myParser
   autogen-modules:
@@ -34,7 +40,10 @@ library
       src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
-      base >=4.7 && <5
+      attoparsec
+    , base >=4.7 && <5
+    , parsec
+    , text
   default-language: Haskell2010
 
 executable myParser-exe
@@ -47,8 +56,11 @@ executable myParser-exe
       app
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      attoparsec
+    , base >=4.7 && <5
     , myParser
+    , parsec
+    , text
   default-language: Haskell2010
 
 test-suite myParser-test
@@ -62,6 +74,9 @@ test-suite myParser-test
       test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      attoparsec
+    , base >=4.7 && <5
     , myParser
+    , parsec
+    , text
   default-language: Haskell2010

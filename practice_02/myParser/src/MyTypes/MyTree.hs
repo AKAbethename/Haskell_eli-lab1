@@ -1,4 +1,4 @@
-module MyTreeMod where
+module MyTypes.MyTree where
 
 --import qualified Data.Functor
 
