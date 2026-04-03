@@ -1,6 +1,6 @@
 module MyEvolModule where
 
-import qualified Data.Random as R
+-- import qualified Data.Random as R
 
 {-
 data MyEvolution = LUCA "Last Universal Common Ancestor" | Cyanobacteria "Synechococcus" | Trilobite "Paradoxides" | 
@@ -9,7 +9,6 @@ data MyEvolution = LUCA "Last Universal Common Ancestor" | Cyanobacteria "Synech
 -}
 
 data MyEvolution = LUCA | Cyanobacteria | Trilobite | Ichthyostega | Dimetrodon | Archaeopteryx | Morganucodon | Purgatorius | Australopithecine | Humans 
-
 
 
 instance Show MyEvolution where
