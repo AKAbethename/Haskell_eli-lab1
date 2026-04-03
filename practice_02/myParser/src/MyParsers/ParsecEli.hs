@@ -30,20 +30,26 @@ digitsParsec :: Parser Int
 digitsParsec = read <$> many1 digit
 
 
--- Парсер для умножения
 finalMultParsec :: Parser Int
 finalMultParsec = (*) <$> digitsParsec <* char '*' <*> digitsParsec
 
--- Парсер для сложения
+
 finalPlusParsec :: Parser Int
 finalPlusParsec = (+) <$> digitsParsec <* char '+' <*> digitsParsec
 
 
-plusOrMultParsec :: Parser Int  -- было Parser Char Int
+
+plusOrMultParsec :: Parser Int 
 plusOrMultParsec = finalMultParsec <|> finalPlusParsec
+
 
 runParser :: Parser a -> String -> MyMaybe (String, a)
 runParser p input = 
     case parse p "" input of
         Left _ -> MyNothing
         Right result -> MyJust (input, result)
+
+
+
+
+
