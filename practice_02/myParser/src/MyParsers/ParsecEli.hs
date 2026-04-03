@@ -15,12 +15,18 @@ charAParsec = char 'A'
 satisfyParsec :: (Char -> Bool) -> Parser Char
 satisfyParsec p = satisfy p
 
+
+
 charParsec :: Char -> Parser Char
 charParsec c = char c
+
+-- char c              = satisfy (==c)  <?> show [c]
 
 
 lowerParsec :: Parser Char
 lowerParsec = lower  
+
+-- lower               = satisfy isLower
 
 
 digitParsec :: Parser Int
@@ -47,9 +53,6 @@ runParser :: Parser a -> String -> MyMaybe (String, a)
 runParser p input = 
     case parse p "" input of
         Left _ -> MyNothing
-        Right result -> MyJust (input, result)
-
-
-
+        Right result -> MyJust ("", result)
 
 

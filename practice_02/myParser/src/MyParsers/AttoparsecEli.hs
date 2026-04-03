@@ -47,4 +47,4 @@ runParser :: Parser a -> String -> MyMaybe (String, a)
 runParser p input = 
      case parseOnly p (T.pack input) of
         Left _ -> MyNothing
-        Right result -> MyJust (input, result)
+        Right result -> MyJust ("", result)
