@@ -40,7 +40,7 @@ instance Read MyEvolution where
 
         'D' : 'i' : 'm' : 'e' : 't' : 'r' : 'o' : 'd' : 'o' : 'n' : rest  -> [(Dimetrodon, rest)]
     
-        'r' : 'c' : 'h' : 'a' : 'e' : 'o' : 'p' : 't' : 'e' : 'r' : 'y' : 'x' : rest  -> [(Archaeopteryx, rest)]
+        'A' : 'r' : 'c' : 'h' : 'a' : 'e' : 'o' : 'p' : 't' : 'e' : 'r' : 'y' : 'x' : rest  -> [(Archaeopteryx, rest)]
     
         'M' : 'o' : 'r' : 'g' : 'a' : 'n' : 'u' : 'c' : 'o' : 'd' : 'o' : 'n' : rest -> [(Morganucodon, rest)]
     

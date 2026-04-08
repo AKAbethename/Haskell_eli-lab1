@@ -8,6 +8,8 @@ import Data.Char (isLower, isUpper, digitToInt, isDigit)
 -- import Control.Applicative (Alternative(..), optional, ZipList(..))
 import qualified Control.Applicative as App
 
+import Text.Parsec (try)
+
 charAParsec :: Parser Char
 charAParsec = char 'A'
 
@@ -46,7 +48,8 @@ finalPlusParsec = (+) <$> digitsParsec <* char '+' <*> digitsParsec
 
 
 plusOrMultParsec :: Parser Int 
-plusOrMultParsec = finalMultParsec <|> finalPlusParsec
+--plusOrMultParsec = finalMultParsec <|> finalPlusParsec
+plusOrMultParsec = try finalMultParsec <|> finalPlusParsec
 
 
 runParser :: Parser a -> String -> MyMaybe (String, a)

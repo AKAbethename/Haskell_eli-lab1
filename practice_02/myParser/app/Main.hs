@@ -10,6 +10,8 @@ import qualified MyParsers.ParsecEli as P
 import qualified MyParsers.AttoparsecEli as A
 
 
+
+
 runParser = My.runParser
 plusOrMult = My.plusOrMult
 
@@ -18,6 +20,7 @@ plusOrMultParsec = P.plusOrMultParsec
 
 runParserAttoParssec = A.runParser
 plusOrMultAttoparsec = A.plusOrMultAttoparsec
+
 
 
 
@@ -36,5 +39,6 @@ main = do
     putStrLn "Attoparsec:"
     putStrLn $ show (A.runParser plusOrMultAttoparsec "12*345dsf")
     putStrLn $ show (A.runParser plusOrMultAttoparsec "12+345dsf")
+
 
 
