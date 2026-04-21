@@ -11,13 +11,21 @@ randomReplaceByte bytes = do
     chV <- randomRIO (0, 255)
     return (replaceByte location chV bytes)
 
+
+randomSortSection :: BC.ByteString -> IO BC.ByteString
+randomSortSection bytes = do
+    let sectionSize = 25
+    let bytesLength = BC.length bytes
+    start <- randomRIO (0, bytesLength - sectionSize)
+    return (sortSection start sectionSize bytes)
+
 main :: IO ()
 main = do
     args <- getArgs
     let fileName = head args
     imageFile <- BC.readFile fileName
     glitched <- randomReplaceByte imageFile
-    let glitchedFileName = "glitched_" ++ fileName  -- проще, чем mconcat
-    BC.writeFile glitchedFileName glitched   -- исправлено: вместо main
+    let glitchedFileName = mconcat ["glitched_", fileName]  
+    BC.writeFile glitchedFileName glitched 
     putStrLn "Готово!"
 

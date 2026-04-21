@@ -17,3 +17,13 @@ replaceByte loc chV bytes = mconcat [before, newChar, after]
         (before,rest) = BC.splitAt loc bytes
         after = BC.drop 1 rest
         newChar = intToBC chV
+
+
+sortSection :: Int -> Int -> BC.ByteString -> BC.ByteString
+sortSection start size bytes =
+    mconcat [before, changed, after]
+  where
+    (before, rest) = BC.splitAt start bytes
+    (target, after) = BC.splitAt size rest
+    changed = BC.reverse (BC.sort target)
+
