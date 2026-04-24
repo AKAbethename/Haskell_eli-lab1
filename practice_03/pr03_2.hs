@@ -54,10 +54,10 @@ labirint = Labir start [Labir chlb [Labir ekb [Labir krd [Labir kzn [Labir smr [
                                     Labir uud [Labir rst [Labir grz [Labir smr [Labir ufa [], Labir finish []], Labir mkhch [Labir prm [Labir ufa [] ] ] ], Labir mkhch [Labir prm [Labir ufa [] ] ] ] ] ] ]
 
 
-data StatE = Found | Finding deriving Show
+data StatE = Found | Finding | Tupik deriving Show
 
 
-getCurRoom :: Labir -> Room
+{- getCurRoom :: Labir -> Room
 getCurRoom (Labir room list) = room
 
 
@@ -73,25 +73,35 @@ goNextFirstRoom (Just (Labir room list)) = case length list of
 
 
 toNextFirstRoom :: Labir -> Labir
-toNextFirstRoom (Labir room list) = fromMaybe (Labir tupik []) (goNextFirstRoom (Just (Labir room list)))
+toNextFirstRoom (Labir room list) = fromMaybe (Labir tupik []) (goNextFirstRoom (Just (Labir room list))) -}
 
 
-{- findRoute :: RWS.RWS (Labir room list) [Room] StatE [Room]
-findRoute = -}
+type Log    = [String]
+type Path   = [Room]
+
+getCurRoom :: Labir -> Room
+getCurRoom (Labir room list) = room
+
+
+children :: Labir -> [Labir]
+children (Labir room ch) = ch
+
+explore :: Labir -> RWS.RWS Labir Log Path Bool
+explore node =
+  let name = getCurRoom node
+  in
+    if name == finish
+    then RWS.modify (name :) >> RWS.tell [name] >> return True
+    else exploreChildren (children node) >>= \found ->
+           if found
+           then RWS.modify (name :) >> RWS.tell ["<- " ++ name] >> return True
+           else return False
 
 
 
-
-
-rwsExample :: RWS.RWS Int [String] Int Int
-rwsExample =
-    RWS.ask >>= \coefficient ->                                 -- коэффициент из Reader
-    RWS.get >>= \counter ->                                     -- текущее состояние (счетчик)
-    RWS.put (counter + 1) >>                                    -- изменение состояния
-    RWS.tell ["Increas counter to " ++ show (counter + 1)] >>   -- логирование действия
-    return (coefficient * counter)                              -- результат (коэффициент * счетчик)
-
-(resultRWS, logsRWS, finalStateRWS) = RWS.runRWS rwsExample 5 1
-
-
-
+exploreChildren :: [Labir] -> RWS.RWS Labir Log Path Bool
+exploreChildren [] = return False
+exploreChildren (c:cs) =
+  explore c >>= \found ->
+  if found then return True
+  else exploreChildren cs
