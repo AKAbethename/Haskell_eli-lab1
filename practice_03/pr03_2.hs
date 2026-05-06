@@ -94,7 +94,7 @@ explore node =
     then RWS.modify (name :) >> RWS.tell [name] >> return True
     else exploreChildren (children node) >>= \found ->
            if found
-           then RWS.modify (name :) >> RWS.tell ["<- " ++ name] >> return True
+           then RWS.modify (name :) >> RWS.tell [name] >> return True
            else return False
 
 
