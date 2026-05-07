@@ -25,3 +25,11 @@ main = do
     putStrLn $ show (runParser plusOrMultAttoparsec "12+345dsf")
 
 -}
+
+
+
+-- (_ <*> _ <*> _) :: Either b (Maybe (a -> a))
+
+-- (_ <$> _ <*> _) :: Maybe (a -> a, b)
+
+
