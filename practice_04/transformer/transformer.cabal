@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       Lib
+      MonadMyStateT
   other-modules:
       Paths_transformer
   autogen-modules:
@@ -35,6 +36,8 @@ library
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       base >=4.7 && <5
+    , mtl
+    , transformers
   default-language: Haskell2010
 
 executable transformer-exe
@@ -48,7 +51,9 @@ executable transformer-exe
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , mtl
     , transformer
+    , transformers
   default-language: Haskell2010
 
 test-suite transformer-test
@@ -63,5 +68,7 @@ test-suite transformer-test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , mtl
     , transformer
+    , transformers
   default-language: Haskell2010
