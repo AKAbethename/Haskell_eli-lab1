@@ -45,7 +45,7 @@ labirint = Labir start [Labir chlb [Labir ekb [Labir krd [Labir kzn [Labir smr [
                                     Labir uud [Labir rst [Labir grz [Labir smr [Labir ufa [], Labir finish []], Labir mkhch [Labir prm [Labir ufa [] ] ] ], Labir mkhch [Labir prm [Labir ufa [] ] ] ] ] ] ]
 
 
-data StatE = Found | Finding | Tupik deriving Show
+data StatE = Found | Finding | Tupik | Lose deriving Show
 
 
 type Log    = [String]
@@ -148,7 +148,7 @@ choice_with_monad our_choice = do
 
 ask_neighbour_room :: IO Room
 ask_neighbour_room = do
-                    putStrLn "Input neighbour_room:"
+                    putStrLn "Введите:"
                     next_room_raw <- getLine
                     let next_room = next_room_raw :: Room
                     return next_room
@@ -194,30 +194,40 @@ go_to_next_room cur_maze next_room = do
 
 -- result <- runReaderT (runWriterT $ My.runMyStateT (go_to_next_room labirint msk) []) [chlb, msk, spb, kzn, kgd, ekb, uud, krd, smr, finish, mkhch, prm, ufa, grz, rst]
                     
-go_to_next_room :: Labir -> My.MyStateT Path (WriterT Log (ReaderT [Room] IO) ) Bool
+go_to_next_room :: Labir -> My.MyStateT [StatE] (WriterT Log (ReaderT [Room] IO) ) Bool
 go_to_next_room cur_maze = do
                 access_rooms <- My.lift $ lift ask
-                if getCurRoom cur_maze == finish
+                if getCurRoom cur_maze == finish  -- если текущая комната -- финиш
                     then do
-                          My.lift $ tell [gameOver]
-                          My.modify (++ [])
+                          My.lift $ tell [] -- или gameOver
+                          My.modify (++ [Found])
                           return True
                 else  -- не финиш => q или комната
-                    if elem (getCurRoom cur_maze) access_rooms -- если комната из данных
+                    if elem (getCurRoom cur_maze) access_rooms -- если комната из данных комнат (внешнее окружение)
                         then do
                                 let next_rooms = getNextRooms cur_maze
-                                if length next_rooms /= 0
+                                if length next_rooms /= 0   -- если есть следующие комнаты из этой
                                     then do
-                                        liftIO $ print next_rooms
-                                        liftIO $ putStrLn "Введите название следующей комнаты или 'q' для выхода"
+                                 --       liftIO $ print next_rooms
+                                        liftIO $ putStrLn "Введите название следующей комнаты, 'look' для просмотра соседних комнат или 'q' для выхода"
                                         next_room <- liftIO ask_neighbour_room
-                                        My.lift $ tell next_rooms
-                                        My.modify (++ [next_room])
-                                        let new_maze = toNextRoom cur_maze next_room
-                                        go_to_next_room new_maze
+                                        if next_room == ("look" :: Room) 
+                                            then do
+                                                liftIO $ print next_rooms
+                                                liftIO $ putStrLn "Введите название следующей комнаты или 'q' для выхода"
+                                                next_room <- liftIO ask_neighbour_room
+                                                My.lift $ tell [next_room]
+                                                My.modify (++ [Finding])
+                                                let new_maze = toNextRoom cur_maze next_room
+                                                go_to_next_room new_maze
+                                            else do
+                                                My.lift $ tell [next_room]
+                                                My.modify (++ [Finding])
+                                                let new_maze = toNextRoom cur_maze next_room
+                                                go_to_next_room new_maze
                                     else do
                                         My.lift $ tell []
-                                        My.modify (++ ["Lose("])
+                                        My.modify (++ [Lose])
                                         return False
                                 {- My.lift & tell next_rooms
                                 My.modify (++ [next_room])
@@ -226,11 +236,11 @@ go_to_next_room cur_maze = do
                             if getCurRoom cur_maze == "q"
                                 then do
                                         My.lift $ tell ["q"]
-                                        My.modify (++ [gameOver])
+                                        My.modify (++ [Found])
                                         return True
                                 else do   --  не финиш и не в списке данных комнат и не q => некорректная комната
                                         My.lift $ tell []
-                                        My.modify (++ [("Incorrect_room" :: Room)])
+                                        My.modify (++ [Lose])
                                         return False
                                             
 
