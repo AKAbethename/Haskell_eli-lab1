@@ -157,3 +157,13 @@ instance MonadTrans (MyStateT s) where
 --    lift :: Monad m => m a -> MyStateT s m a 
     lift m = MyStateT $ \st -> do {v <- m; return (v, st);}
 
+
+get :: Monad m => MyStateT s m s
+get = MyStateT $ \s -> return (s, s)
+
+put :: Monad m => s -> MyStateT s m ()
+put s = MyStateT $ \_ -> return ((), s)
+
+modify :: Monad m => (s -> s) -> MyStateT s m ()
+modify f = MyStateT $ \s -> return ((), f s)
+
