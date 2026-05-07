@@ -113,14 +113,16 @@ getNextRooms' (Left str) = []
 getNextRooms' (Right (Labir room [])) = []
 getNextRooms' (Right (Labir room (r:rest))) = ((getCurRoom r) : getNextRooms (Labir room rest))
 
-toNextRoom :: Labir -> Room -> Either String Labir
+{- toNextRoom :: Labir -> Room -> Either String Labir
 toNextRoom (Labir room_s []) room_to = Left "Error" 
 
 toNextRoom (Labir room_s (l:ls)) room_to = if getCurRoom l == room_to
                                             then Right l 
-                                            else toNextRoom (Labir room_s ls) room_to
+                                            else toNextRoom (Labir room_s ls) room_to -}
 
-toNextRoom (Labir room_s (l:ls)) room_to = 
+toNextRoom :: Labir -> Room -> Labir
+toNextRoom (Labir room_s []) room_to = Labir tupik []
+toNextRoom (Labir room_s (l:ls)) room_to = if getCurRoom l == room_to then l else toNextRoom (Labir room_s ls) room_to
 -- здесь точно следующая комната есть, ошибки нету
 
 
@@ -151,22 +153,93 @@ ask_neighbour_room = do
                     let next_room = next_room_raw :: Room
                     return next_room
 
-
-go_to_next_room :: Labir -> Room -> My.MyStateT Path (WriterT Log (ReaderT [Room] Identity) ) Bool
+{- 
+go_to_next_room :: Labir -> Room -> My.MyStateT Path (WriterT Log (ReaderT [Room] IO) ) Bool
 go_to_next_room cur_maze next_room = do
                     cur_next_rooms <- My.lift $ lift ask 
-                    if elem next_room cur_next_rooms 
-                        then if getNextRooms cur_maze != [] 
-                             then do{} 
-                             else do {My.lift $ tell ["next is " ++ next_room]; My.modify (next_room :); return True}
-                        else do
-                            My.lift $ tell ["error"] 
-                            My.modify (("empty room" :: Room) :)
-                            return False
+                    if getCurRoom cur_maze == finish || length cur_next_rooms == 0
+                        then do
+                                My.lift $ tell ["FINISH"]
+                                My.modify (++ [finish])
+                                return True
+                        else if elem next_room cur_next_rooms 
+                                then if getNextRooms cur_maze /= [] 
+                                        then do 
+                                                My.lift $ tell [next_room] 
+                                                My.modify (++ [next_room])
+                                                let next_maze = toNextRoom cur_maze next_room
+                                                let next_rooms2 = getNextRooms next_maze
+                                                liftIO $ putStrLn "Соседние комнаты"
+                                                liftIO $ print next_rooms2
+                                                liftIO $ putStrLn "Введите q, чтобы выйти"
+                                                new_room <- liftIO ask_neighbour_room 
+                                                go_to_next_room next_maze new_room
+                                        else do 
+                                                My.lift $ tell ["next is " ++ next_room]  
+                                                My.modify (next_room :)
+                                                return True
+                                else if next_room /= ("q" :: Room) 
+                                    then do
+                                        My.lift $ tell ["error"] 
+                                        My.modify (("empty room" :: Room) :)
+                                        return False
+                                    else do
+                                        My.lift $ tell ["q"]
+                                        My.modify (++ [gameOver])
+                                        return False -}
+
 
 
 -- runIdentity $ runReaderT (runWriterT $ My.runMyStateT (go_to_next_room labirint chlb) []) [chlb, msk, spb]
+
+-- result <- runReaderT (runWriterT $ My.runMyStateT (go_to_next_room labirint msk) []) [chlb, msk, spb, kzn, kgd, ekb, uud, krd, smr, finish, mkhch, prm, ufa, grz, rst]
                     
+go_to_next_room :: Labir -> My.MyStateT Path (WriterT Log (ReaderT [Room] IO) ) Bool
+go_to_next_room cur_maze = do
+                access_rooms <- My.lift $ lift ask
+                if getCurRoom cur_maze == finish
+                    then do
+                          My.lift $ tell [gameOver]
+                          My.modify (++ [])
+                          return True
+                else  -- не финиш => q или комната
+                    if elem (getCurRoom cur_maze) access_rooms -- если комната из данных
+                        then do
+                                let next_rooms = getNextRooms cur_maze
+                                if length next_rooms /= 0
+                                    then do
+                                        liftIO $ print next_rooms
+                                        liftIO $ putStrLn "Введите название следующей комнаты или 'q' для выхода"
+                                        next_room <- liftIO ask_neighbour_room
+                                        My.lift $ tell next_rooms
+                                        My.modify (++ [next_room])
+                                        let new_maze = toNextRoom cur_maze next_room
+                                        go_to_next_room new_maze
+                                    else do
+                                        My.lift $ tell []
+                                        My.modify (++ ["Lose("])
+                                        return False
+                                {- My.lift & tell next_rooms
+                                My.modify (++ [next_room])
+                                return True -}
+                        else -- не финиш и не в списке данных комнат
+                            if getCurRoom cur_maze == "q"
+                                then do
+                                        My.lift $ tell ["q"]
+                                        My.modify (++ [gameOver])
+                                        return True
+                                else do   --  не финиш и не в списке данных комнат и не q => некорректная комната
+                                        My.lift $ tell []
+                                        My.modify (++ [("Incorrect_room" :: Room)])
+                                        return False
+                                            
+
+
+
+                        
+                    
+
+
 
 {- go_to_children :: [Labir] ->  -}
 

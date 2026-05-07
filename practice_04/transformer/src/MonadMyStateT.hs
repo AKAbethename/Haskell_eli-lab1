@@ -2,6 +2,9 @@
 
 module MonadMyStateT where
 
+import Control.Monad.IO.Class (MonadIO(..))
+
+
 newtype MyStateT s m a = MyStateT { runMyStateT :: s -> m (a, s) }
 
 
@@ -166,4 +169,11 @@ put s = MyStateT $ \_ -> return ((), s)
 
 modify :: Monad m => (s -> s) -> MyStateT s m ()
 modify f = MyStateT $ \s -> return ((), f s)
+
+
+
+instance MonadIO m => MonadIO (MyStateT s m) where
+    liftIO io = MyStateT $ \s -> do
+        a <- liftIO io
+        return (a, s)
 
