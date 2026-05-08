@@ -65,3 +65,5 @@ exploreChildren (c:cs) =
   explore c >>= \found ->
   if found then return True
   else exploreChildren cs
+
+

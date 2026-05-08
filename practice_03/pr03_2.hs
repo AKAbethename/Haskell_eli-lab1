@@ -57,6 +57,33 @@ labirint = Labir start [Labir chlb [Labir ekb [Labir krd [Labir kzn [Labir smr [
 data StatE = Found | Finding | Tupik deriving Show
 
 
+getNextRooms :: Labir -> [Room]
+getNextRooms (Labir room (r:rest)) = (getCurRoom r) : getNextRooms (Labir room rest)
+getNextRooms (Labir room []) = []
+
+
+getNextRooms' :: Either String Labir -> [Room]
+getNextRooms' (Left str) = []
+getNextRooms' (Right (Labir room [])) = []
+getNextRooms' (Right (Labir room (r:rest))) = ((getCurRoom r) : getNextRooms (Labir room rest))
+
+toNextRoom :: Labir -> Room -> Either String Labir
+toNextRoom (Labir room_s []) room_to = Left "Error" 
+
+toNextRoom (Labir room_s (l:ls)) room_to = if getCurRoom l == room_to
+                                            then Right l 
+                                            else toNextRoom (Labir room_s ls) room_to
+
+toNextRoom' :: Either String Labir -> Room -> Either String Labir
+toNextRoom' (Left "Error") _ = Left "Error"
+toNextRoom' (Right (Labir room_s (l:ls))) room_to = if getCurRoom l == room_to
+                                                 then Right l 
+                                      --          else (toNextRoom' (Right (Labir room_s ls)) room_to)
+                                                 else if length ls == 0 
+                                                      then (toNextRoom' (Left "Error") room_to)
+                                                      else (toNextRoom' (Right (Labir room_s ls)) room_to)
+
+
 {- getCurRoom :: Labir -> Room
 getCurRoom (Labir room list) = room
 
