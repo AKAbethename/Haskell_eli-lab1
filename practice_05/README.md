@@ -11,3 +11,20 @@
 ## Коммит "practice_05-ver-2026-05-14-21-57"
 
 Продолжение выполнения практического задания №5. Создание тестов для функции addMod, проверяющих коммутативность, нейтральный элемент и сложение по модулю. Написание тестов для функции reverseWords. Дальнейшее создание вторых версий всех перечисленных функций для reverseWords и самой reverseWords, использующих вместо Strign T.Text. Для пустой строки, строки из одного слова тесты проходятся на 100 из 100.
+
+
+## Коммит "practice_05-ver-2026-05-14-22-28"
+
+Продолжение выполнения практического задания №5. Создание свойства prop_fewWordsStr2 для проверки строки из нескольких слов, которое генерирует n строк str1, и из них составляет строку, которая в дальнейшем проверяется. Это нужно, потому что генератор чаще всего генерирует строку из одного слова. Создание свойства prop_double_applicate, которое проверяет двойное применение функции reverseWords. 
+
+
+prop_fewWordsStr2 :: String -> Int -> Property
+prop_fewWordsStr2 str1 n = ((length $ getWords $ trim str) > 1 && n > 1) ==> (head $ getWords str) == (head . getWords . reverseWords $ reverseWords str )
+    where str = myJoin $ replicate n str1
+
+-- почти всегда генерируется одно слово, поэтому проще генерировать одно слово несколько раз
+
+
+prop_double_applicate :: String -> Int -> Property
+prop_double_applicate str1 n = (n > 1) ==> str == (reverseWords $ reverseWords str)
+    where str = myJoin $ replicate n str1

@@ -29,6 +29,8 @@ import qualified Data.Text as T
 addMod :: Int -> Int -> Int -> Int
 addMod x y m = (x + y) `mod` m
 
+
+
 reverseWords :: String -> String
 reverseWords " " = " "
 reverseWords src = myJoin $ reverse $ getWords $ src
@@ -71,6 +73,7 @@ reverseWords2 :: T.Text -> T.Text
 reverseWords2 src = myJoin2 . reverse . getWords2 $ src
 --  | T.all (== ' ') src = src   -- строка из одних пробелов
 --  | otherwise = myJoin . reverse . T.words $ src
+
 
 
 
