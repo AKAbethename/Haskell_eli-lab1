@@ -1,7 +1,8 @@
 module Lib 
     where
 
-
+import Data.Char (isSpace)
+import qualified Data.Text as T
 {-
 - Создайте и настройте проект
 
@@ -29,20 +30,48 @@ addMod :: Int -> Int -> Int -> Int
 addMod x y m = (x + y) `mod` m
 
 reverseWords :: String -> String
+reverseWords " " = " "
 reverseWords src = myJoin $ reverse $ getWords $ src
 
 
-getWords :: String -> [String]  -- разбивает строку на список слов
+getWords :: String -> [String]  -- разбивает строку на список слов 
 getWords str = getWords' [] [] str
         where 
             getWords' acc [] [] = reverse acc  -- конец
             getWords' acc curWord [] = reverse $ (reverse $ curWord) : acc
+--            getWords' acc curWord " " = reverse $ ((reverse $ " " ++ curWord) : acc)
+            getWords' acc curWord " " = reverse $ "" : (reverse curWord) : acc
             getWords' acc curWord (l:ls) = if l == ' ' then getWords' ((reverse $ curWord) : acc) [] ls else getWords' acc (l:curWord) ls
             
 
 myJoin :: [String] -> String  -- склейка слов в одну строку
 myJoin [] = ""
 myJoin (word : words) = word ++ (if length words == 0 then myJoin words else " " ++ myJoin words)
+
+
+trim :: String -> String
+trim = f . f
+    where f = reverse . dropWhile isSpace
+
+
+trim2 :: T.Text -> T.Text
+trim2 = T.strip
+
+
+myJoin2 :: [T.Text] -> T.Text
+myJoin2 [] = T.empty
+myJoin2 [w] = w
+myJoin2 (w : ws) = w <> T.singleton ' ' <> myJoin2 ws
+
+
+getWords2 :: T.Text -> [T.Text]
+getWords2 = T.words
+
+reverseWords2 :: T.Text -> T.Text
+reverseWords2 src = myJoin2 . reverse . getWords2 $ src
+--  | T.all (== ' ') src = src   -- строка из одних пробелов
+--  | otherwise = myJoin . reverse . T.words $ src
+
 
 
 
